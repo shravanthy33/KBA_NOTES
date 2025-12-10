@@ -84,7 +84,6 @@ async function loadNote(noteId) {
     document.getElementById('container').innerHTML = `<p>Note not found: ${noteId}</p>`;
   }
 }
-
 function renderNote(note) {
   document.getElementById('container').innerHTML = `
     <section class="note-metadata">
@@ -97,36 +96,20 @@ function renderNote(note) {
     </section>
 
     <section class="note-content">
-      <h2>Description</h2>
-      <p>${note.Description || ''}</p>
-
-      <h2>Symptom</h2>
-      <p>${note.Symptom || ''}</p>
-
+      <h2>Description</h2><p>${note.Description || ''}</p>
+      <h2>Symptom</h2><p>${note.Symptom || ''}</p>
       <h2>Reproducing the Issue</h2>
-      <ul>
-        ${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}
-      </ul>
-
-      <h2>Cause</h2>
-      <p>${note.Cause || ''}</p>
-
-      <h2>Resolution</h2>
-      <p>${note.Resolution || ''}</p>
-
+      <ul>${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}</ul>
+      <h2>Cause</h2><p>${note.Cause || ''}</p>
+      <h2>Resolution</h2><p>${note.Resolution || ''}</p>
       <h2>Additional Info</h2>
       <ul>
         <li><strong>DO:</strong> ${note["Additional Info"]?.DO || ''}</li>
         <li><strong>WRICEF:</strong> ${note["Additional Info"]?.WRICEF || ''}</li>
       </ul>
     </section>
-
-    <div class="note-list">
-      <button onclick="showSearch()">Back to Search</button>
-    </div>
   `;
 }
-
 function showSearch() {
   document.getElementById('container').innerHTML = `
     <input type="text" id="searchBox" placeholder="Search KBAs...">
@@ -154,3 +137,4 @@ loadIndex();
 </script>
 </body>
 </html>
+
