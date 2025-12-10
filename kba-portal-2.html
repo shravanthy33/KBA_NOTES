@@ -7,7 +7,6 @@
 <style>
 body { font-family: Arial, sans-serif; margin: 0; background-color: #f8f9fa; }
 header { background-color: #002b5c; color: white; padding: 1em; display: flex; justify-content: space-between; align-items: center; }
-nav a { color: white; margin-left: 1em; text-decoration: none; cursor: pointer; }
 .note-list a { display: block; padding: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #002b5c; cursor: pointer; }
 .note-list a:hover { background: #f0f0f0; }
 .note-container { display: flex; flex-wrap: wrap; gap: 1em; }
@@ -39,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
   let notesList = [];
 
-  // Load index.json and render clickable list
   async function loadIndex() {
     try {
       const res = await fetch(INDEX_URL);
@@ -59,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ).join("");
   }
 
-  // Event delegation for clicks
   document.getElementById("results").addEventListener("click", e => {
     if (e.target.tagName === "A") {
       e.preventDefault();
