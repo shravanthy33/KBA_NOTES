@@ -108,43 +108,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function renderNote(note) {
-    const hasImage = note.Images && note.Images.length > 0;
-    document.getElementById('container').innerHTML = `
-      <div class="note-container">
-        <div class="note-left ${!hasImage ? 'full-width' : ''}">
-          <section class="note-metadata">
-            <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
-            <ul>
-              <li><strong>Date:</strong> ${note.Date || ''}</li>
-              <li><strong>Environment:</strong> ${note.Environment || ''}</li>
-              <li><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</li>
-            </ul>
-          </section>
-          <section class="note-content">
-            <h2>Description</h2><p>${note.Description || ''}</p>
-            <h2>Symptom</h2><p>${note.Symptom || ''}</p>
-            <h2>Reproducing the Issue</h2>
-            <ul>${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}</ul>
-            <h2>Cause</h2><p>${note.Cause || ''}</p>
-            <h2>Resolution</h2><p>${note.Resolution || ''}</p>
-            <h2>Additional Info</h2>
-            <ul>
-              <li><strong>DO:</strong> ${note["Additional Info"]?.DO || ''}</li>
-              <li><strong>WRICEF:</strong> ${note["Additional Info"]?.WRICEF || ''}</li>
-            </ul>
-          </section>
-          <div class="note-list">
-            <button id="backBtn">Back to Search</button>
-          </div>
-        </div>
-        ${hasImage ? `<div class="note-right"><img src="${note.Images[0]}" alt="KBA Image"></div>` : ''}
-      </div>
-    `;
+function renderNote(note) {
+  const hasImage = note.Images && note.Images.length > 0;
 
-    // Back button logic
-    document.getElementById("backBtn").addEventListener("click", showSearch);
-  }
+  document.getElementById('container').innerHTML = `
+    <div class="note-container">
+      <div class="note-left ${!hasImage ? 'full-width' : ''}">
+        <section class="note-metadata">
+          <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
+          <ul>
+            <li><strong>Date:</strong> ${note.Date || ''}</li>
+            <li><strong>Environment:</strong> ${note.Environment || ''}</li>
+            <li><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</li>
+          </ul>
+        </section>
+
+        <section class="note-content">
+          <h2>Description</h2>
+          <p>${note.Description || ''}</p>
+
+          <h2>Symptom</h2>
+          <p>${note.Symptom || ''}</p>
+
+          <h2>Reproducing the Issue</h2>
+          <ul>
+            ${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}
+          </ul>
+
+          <h2>Cause</h2>
+          <p>${note.Cause || ''}</p>
+
+          <h2>Resolution</h2>
+          <p>${note.Resolution || ''}</p>
+
+          <h2>Additional Info</h2>
+          <ul>
+            ${note["Additional Info"] 
+              ? Object.entries(note["Additional Info"])
+                  .map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`)
+                  .join('')
+              : ''
+            }
+          </ul>
+        </section>
+
+        <div class="note-list">
+          <button onclick="showSearch()">Back to Search</button>
+        </div>
+      </div>
+
+      ${hasImage ? `
+      <div class="note-right">
+        <img src="${note.Images[0]}" alt="KBA Image">
+      </div>` : ''}
+    </div>
+  `;
+}
 
   function showSearch() {
     console.log("🔙 Returning to search");
@@ -167,3 +186,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
