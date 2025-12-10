@@ -7,7 +7,7 @@
 <style>
 body { font-family: Arial, sans-serif; margin: 0; background-color: #f8f9fa; }
 header { background-color: #002b5c; color: white; padding: 1em; display: flex; justify-content: space-between; align-items: center; }
-nav a { color: white; margin-left: 1em; text-decoration: none; }
+nav a { color: white; margin-left: 1em; text-decoration: none; cursor: pointer; }
 .note-list, .note-metadata, .note-content { background: white; padding: 1em; margin: 1em; border-radius: 5px; }
 .note-list a { display: block; margin-bottom: 0.5em; color: #002b5c; text-decoration: none; cursor: pointer; }
 input { padding: 0.5em; width: 90%; margin: 1em; }
@@ -19,7 +19,7 @@ footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size:
 <header>
   <div class="logo">Danfoss KBA</div>
   <nav>
-    <a href="#" onclick="showSearch()">Search</a>
+    <a onclick="showSearch()">Search</a>
   </nav>
 </header>
 
@@ -33,7 +33,6 @@ footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size:
 </footer>
 
 <script>
-// URL to index.json in your repo root
 const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
 let notesList = [];
 
@@ -65,7 +64,7 @@ document.addEventListener("input", e => {
 });
 
 async function loadNote(noteId) {
-  const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`; // ✅ correct path
+  const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`;
   try {
     const response = await fetch(fileUrl);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -79,18 +78,18 @@ async function loadNote(noteId) {
 function renderNote(note) {
   document.getElementById('container').innerHTML = `
     <section class="note-metadata">
-      <h1>${note.note_number}: ${note.title}</h1>
+      <h1>${note.note_number || ''}: ${note.title || ''}</h1>
       <ul>
-        <li><strong>Status:</strong> ${note.status}</li>
-        <li><strong>Priority:</strong> ${note.priority}</li>
-        <li><strong>Component:</strong> ${note.component}</li>
-        <li><strong>Validity:</strong> ${note.validity.from} to ${note.validity.to}</li>
+        <li><strong>Status:</strong> ${note.status || ''}</li>
+        <li><strong>Priority:</strong> ${note.priority || ''}</li>
+        <li><strong>Component:</strong> ${note.component || ''}</li>
+        <li><strong>Validity:</strong> ${(note.validity?.from || '')} to ${(note.validity?.to || '')}</li>
       </ul>
     </section>
     <section class="note-content">
-      <h2>Symptom</h2><p>${note.symptom}</p>
-      <h2>Cause</h2><p>${note.cause}</p>
-      <h2>Solution</h2><p>${note.solution}</p>
+      <h2>Symptom</h2><p>${note.symptom || ''}</p>
+      <h2>Cause</h2><p>${note.cause || ''}</p>
+      <h2>Solution</h2><p>${note.solution || ''}</p>
     </section>
     <div class="note-list">
       <button onclick="showSearch()">Back to Search</button>
@@ -106,7 +105,6 @@ function showSearch() {
   renderList(notesList);
 }
 
-// Load index.json on page start
 loadIndex();
 </script>
 </body>
