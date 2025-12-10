@@ -31,13 +31,12 @@ footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size:
 <footer>
   <p>&copy; 2025 Danfoss. All rights reserved.</p>
 </footer>
-
 <script>
 const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
 let notesList = [];
 
-// ✅ Make sure these functions are global
-async function loadIndex() {
+// ✅ Attach functions to window so inline onclick works
+window.loadIndex = async function () {
   console.log("Loading index from", INDEX_URL);
   try {
     const res = await fetch(INDEX_URL);
@@ -50,15 +49,15 @@ async function loadIndex() {
   }
 }
 
-function renderList(list) {
+window.renderList = function (list) {
   const results = document.getElementById("results");
   results.innerHTML = list.map(note => 
     `<a href="javascript:void(0)" onclick="loadNote('${note.id}')">${note.id} - ${note.title}</a>`
   ).join("");
 }
 
-async function loadNote(noteId) {
-  console.log("Loading note:", noteId);
+window.loadNote = async function (noteId) {
+  console.log("Clicked note:", noteId);
   const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`;
   console.log("Fetching from", fileUrl);
   try {
@@ -74,7 +73,7 @@ async function loadNote(noteId) {
   }
 }
 
-function renderNote(note) {
+window.renderNote = function (note) {
   document.getElementById('container').innerHTML = `
     <section class="note-metadata">
       <h1>${note.note_number || ''}: ${note.title || ''}</h1>
@@ -96,7 +95,7 @@ function renderNote(note) {
   `;
 }
 
-function showSearch() {
+window.showSearch = function () {
   document.getElementById('container').innerHTML = `
     <input type="text" id="searchBox" placeholder="Search KBAs...">
     <div id="results" class="note-list">Loading KBAs...</div>
@@ -119,7 +118,9 @@ document.getElementById("searchBox").addEventListener("input", e => {
   renderList(filtered);
 });
 
+// ✅ Start by loading the index
 loadIndex();
 </script>
 </body>
 </html>
+
