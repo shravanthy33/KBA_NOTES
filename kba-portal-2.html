@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Danfoss KBA Search & Viewer</title>
+<title>Danfoss KBA Portal</title>
 <style>
 body { font-family: Arial, sans-serif; margin: 0; background-color: #f8f9fa; }
 header { background-color: #002b5c; color: white; padding: 1em; display: flex; justify-content: space-between; align-items: center; }
@@ -13,6 +13,10 @@ nav a { color: white; margin-left: 1em; text-decoration: none; cursor: pointer; 
 input { padding: 0.5em; width: 90%; margin: 1em; }
 h1, h2, h3 { color: #002b5c; }
 footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size: 0.9em; }
+.image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 10px; }
+.image-item { overflow: hidden; border: 1px solid #ccc; border-radius: 6px; }
+.image-item img { width: 100%; height: auto; transition: transform 0.3s ease; }
+.image-item img:hover { transform: scale(1.05); }
 </style>
 </head>
 <body>
@@ -116,14 +120,19 @@ function renderNote(note) {
 
       <h2>Additional Info</h2>
       <ul>
+        <li><strong>Trigger:</strong> ${note["Additional Info"]?.Trigger || ''}</li>
         <li><strong>DO:</strong> ${note["Additional Info"]?.DO || ''}</li>
         <li><strong>WRICEF:</strong> ${note["Additional Info"]?.WRICEF || ''}</li>
       </ul>
 
       ${note.Images && note.Images.length ? `
         <h2>Images</h2>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;">
-          ${note.Images.map(img => `<img src="${img}" alt="KBA Image" style="max-width:300px;border:1px solid #ccc;border-radius:4px;">`).join('')}
+        <div class="image-grid">
+          ${note.Images.map(img => `
+            <div class="image-item">
+              <img src="${img}" alt="KBA Image" loading="lazy">
+            </div>
+          `).join('')}
         </div>
       ` : ''}
     </section>
@@ -161,4 +170,3 @@ loadIndex();
 </script>
 </body>
 </html>
-
