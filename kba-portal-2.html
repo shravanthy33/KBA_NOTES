@@ -92,21 +92,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  async function loadNote(noteId) {
-    const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`;
-    console.log("Fetching note from", fileUrl);
-    try {
-      const response = await fetch(fileUrl);
-      console.log("Status:", response.status);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const note = await response.json();
-      console.log("Note data:", note);
-      renderNote(note);
-    } catch (error) {
-      console.error("Error fetching note:", error);
-      document.getElementById('container').innerHTML = `<p>Note not found: ${noteId}</p>`;
-    }
+async function loadNote(noteId) {
+  const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`;
+  console.log("Fetching:", fileUrl);
+  try {
+    const response = await fetch(fileUrl);
+    console.log("Status:", response.status);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const note = await response.json();
+    console.log("Fetched note object:", note); // 👈 This will show exactly what we got
+    renderNote(note);
+  } catch (error) {
+    console.error("Error fetching note:", error);
+    document.getElementById('container').innerHTML = `<p>Note not found: ${noteId}</p>`;
   }
+}
 
 function renderNote(note) {
   const hasImage = note.Images && note.Images.length > 0;
@@ -186,4 +186,5 @@ function renderNote(note) {
 </script>
 </body>
 </html>
+
 
