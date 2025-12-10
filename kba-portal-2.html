@@ -36,13 +36,13 @@ footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size:
 const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
 let notesList = [];
 
+// Load index.json and fetch titles from each KBA JSON file
 async function loadIndex() {
   try {
     const res = await fetch(INDEX_URL);
-    const ids = await res.json(); // index.json should just have IDs
+    const ids = await res.json();
     notesList = [];
 
-    // Fetch each JSON file to get its Title
     for (let entry of ids) {
       const fileUrl = `${window.location.origin}/KBA_NOTES/${entry.id}.json`;
       try {
@@ -51,14 +51,11 @@ async function loadIndex() {
         const noteData = await noteRes.json();
         notesList.push({
           id: entry.id,
-          title: noteData.Title || entry.title || "Untitled KBA"
+          title: noteData.Title || "Untitled KBA"
         });
       } catch (err) {
         console.error(`Error loading ${entry.id}.json`, err);
-        notesList.push({
-          id: entry.id,
-          title: entry.title || "Untitled KBA"
-        });
+        notesList.push({ id: entry.id, title: "Untitled KBA" });
       }
     }
 
@@ -157,4 +154,3 @@ loadIndex();
 </script>
 </body>
 </html>
-
