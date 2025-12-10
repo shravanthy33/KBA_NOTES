@@ -33,89 +33,89 @@ ul { padding-left: 20px; }
 </main>
 
 <script>
-const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM fully loaded, attaching events...");
 
-// Load index.json and render list
-async function loadIndex() {
-  try {
-    const res = await fetch(INDEX_URL);
-    const kbList = await res.json();
-    const aside = document.getElementById("kba-list");
-    aside.innerHTML = kbList.map(kba => 
-      `<a href="#" data-file="${kba.file}">${kba.id}</a>`
-    ).join("");
-  } catch (err) {
-    document.getElementById("kba-list").innerHTML = "<p>Error loading index.json</p>";
-  }
-}
+  const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
 
-// Event delegation for clicks
-document.getElementById("kba-list").addEventListener("click", e => {
-  if (e.target.tagName === "A") {
-    e.preventDefault();
-    const fileName = e.target.getAttribute("data-file");
-    console.log("Clicked:", fileName);
-    loadKBA(fileName);
+  async function loadIndex() {
+    try {
+      const res = await fetch(INDEX_URL);
+      const kbList = await res.json();
+      const aside = document.getElementById("kba-list");
+      aside.innerHTML = kbList.map(kba => 
+        `<a href="#" data-file="${kba.file}">${kba.id}</a>`
+      ).join("");
+      console.log("Index loaded:", kbList);
+    } catch (err) {
+      document.getElementById("kba-list").innerHTML = "<p>Error loading index.json</p>";
+    }
   }
+
+  document.getElementById("kba-list").addEventListener("click", e => {
+    if (e.target.tagName === "A") {
+      e.preventDefault();
+      const fileName = e.target.getAttribute("data-file");
+      console.log("Clicked:", fileName);
+      loadKBA(fileName);
+    }
+  });
+
+  async function loadKBA(fileName) {
+    const fileUrl = `${window.location.origin}/KBA_NOTES/${fileName}`;
+    console.log("Fetching:", fileUrl);
+    try {
+      const res = await fetch(fileUrl);
+      console.log("Status:", res.status);
+      if (!res.ok) throw new Error("Note not found");
+      const note = await res.json();
+      console.log("Note data:", note);
+      renderKBA(note);
+    } catch (err) {
+      document.getElementById("kba-content").innerHTML = `<div class="left-pane"><p>${err.message}</p></div>`;
+    }
+  }
+
+  function renderKBA(note) {
+    const leftPane = document.createElement("div");
+    leftPane.className = "left-pane";
+    leftPane.innerHTML = `
+      <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
+      <p><strong>Date:</strong> ${note.Date || ''}</p>
+      <p><strong>Environment:</strong> ${note.Environment || ''}</p>
+      <p><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</p>
+      <h2>Description</h2><p>${note.Description || ''}</p>
+      <h2>Symptom</h2><p>${note.Symptom || ''}</p>
+      <h2>Reproducing the Issue</h2>
+      <ul>${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}</ul>
+      <h2>Cause</h2><p>${note.Cause || ''}</p>
+      <h2>Resolution</h2><p>${note.Resolution || ''}</p>
+      <h2>Additional Info</h2>
+      <ul>
+        ${note["Additional Info"] ? Object.entries(note["Additional Info"]).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('') : ''}
+      </ul>
+    `;
+
+    const rightPane = document.createElement("div");
+    rightPane.className = "right-pane";
+    if (note.Images && note.Images.length) {
+      rightPane.innerHTML = `<img src="${note.Images[0]}" alt="KBA Image">`;
+      rightPane.style.display = "flex";
+    } else {
+      leftPane.classList.add("full-width");
+      rightPane.style.display = "none";
+    }
+
+    const contentDiv = document.getElementById("kba-content");
+    contentDiv.innerHTML = "";
+    contentDiv.appendChild(leftPane);
+    if (note.Images && note.Images.length) {
+      contentDiv.appendChild(rightPane);
+    }
+  }
+
+  loadIndex();
 });
-
-// Load and render a KBA
-async function loadKBA(fileName) {
-  const fileUrl = `${window.location.origin}/KBA_NOTES/${fileName}`;
-  console.log("Fetching:", fileUrl);
-  try {
-    const res = await fetch(fileUrl);
-    console.log("Status:", res.status);
-    if (!res.ok) throw new Error("Note not found");
-    const note = await res.json();
-    console.log("Note data:", note);
-    renderKBA(note);
-  } catch (err) {
-    document.getElementById("kba-content").innerHTML = `<div class="left-pane"><p>${err.message}</p></div>`;
-  }
-}
-
-// Render KBA details
-function renderKBA(note) {
-  const leftPane = document.createElement("div");
-  leftPane.className = "left-pane";
-  leftPane.innerHTML = `
-    <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
-    <p><strong>Date:</strong> ${note.Date || ''}</p>
-    <p><strong>Environment:</strong> ${note.Environment || ''}</p>
-    <p><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</p>
-    <h2>Description</h2><p>${note.Description || ''}</p>
-    <h2>Symptom</h2><p>${note.Symptom || ''}</p>
-    <h2>Reproducing the Issue</h2>
-    <ul>${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}</ul>
-    <h2>Cause</h2><p>${note.Cause || ''}</p>
-    <h2>Resolution</h2><p>${note.Resolution || ''}</p>
-    <h2>Additional Info</h2>
-    <ul>
-      ${note["Additional Info"] ? Object.entries(note["Additional Info"]).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('') : ''}
-    </ul>
-  `;
-
-  const rightPane = document.createElement("div");
-  rightPane.className = "right-pane";
-  if (note.Images && note.Images.length) {
-    rightPane.innerHTML = `<img src="${note.Images[0]}" alt="KBA Image">`;
-    rightPane.style.display = "flex";
-  } else {
-    leftPane.classList.add("full-width");
-    rightPane.style.display = "none";
-  }
-
-  const contentDiv = document.getElementById("kba-content");
-  contentDiv.innerHTML = "";
-  contentDiv.appendChild(leftPane);
-  if (note.Images && note.Images.length) {
-    contentDiv.appendChild(rightPane);
-  }
-}
-
-// Start
-loadIndex();
 </script>
 </body>
 </html>
