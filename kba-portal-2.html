@@ -31,71 +31,83 @@ footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size:
 <footer>
   <p>&copy; 2025 Danfoss. All rights reserved.</p>
 </footer>
+
 <script>
 const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
 let notesList = [];
 
-// ✅ Attach functions to window so inline onclick works
-window.loadIndex = async function () {
-  console.log("Loading index from", INDEX_URL);
+async function loadIndex() {
   try {
     const res = await fetch(INDEX_URL);
     notesList = await res.json();
-    console.log("Index loaded", notesList);
     renderList(notesList);
   } catch (err) {
-    console.error("Error loading index.json", err);
     document.getElementById("results").innerHTML = "<p>Error loading index.json</p>";
   }
 }
 
-window.renderList = function (list) {
+function renderList(list) {
   const results = document.getElementById("results");
   results.innerHTML = list.map(note => 
     `<a href="javascript:void(0)" onclick="loadNote('${note.id}')">${note.id} - ${note.title}</a>`
   ).join("");
 }
 
-window.loadNote = async function (noteId) {
-  console.log("Clicked note:", noteId);
+async function loadNote(noteId) {
   const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`;
-  console.log("Fetching from", fileUrl);
   try {
     const response = await fetch(fileUrl);
-    console.log("Fetch status:", response.status);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const note = await response.json();
-    console.log("Note loaded", note);
     renderNote(note);
   } catch (error) {
-    console.error("Error loading note:", error);
     document.getElementById('container').innerHTML = `<p>Note not found: ${noteId}</p>`;
   }
 }
 
-window.renderNote = function (note) {
+function renderNote(note) {
   document.getElementById('container').innerHTML = `
     <section class="note-metadata">
-      <h1>${note.note_number || ''}: ${note.title || ''}</h1>
+      <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
       <ul>
-        <li><strong>Status:</strong> ${note.status || ''}</li>
-        <li><strong>Priority:</strong> ${note.priority || ''}</li>
-        <li><strong>Component:</strong> ${note.component || ''}</li>
-        <li><strong>Validity:</strong> ${(note.validity?.from || '')} to ${(note.validity?.to || '')}</li>
+        <li><strong>Date:</strong> ${note.Date || ''}</li>
+        <li><strong>Environment:</strong> ${note.Environment || ''}</li>
+        <li><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</li>
       </ul>
     </section>
+
     <section class="note-content">
-      <h2>Symptom</h2><p>${note.symptom || ''}</p>
-      <h2>Cause</h2><p>${note.cause || ''}</p>
-      <h2>Solution</h2><p>${note.solution || ''}</p>
+      <h2>Description</h2>
+      <p>${note.Description || ''}</p>
+
+      <h2>Symptom</h2>
+      <p>${note.Symptom || ''}</p>
+
+      <h2>Reproducing the Issue</h2>
+      <ul>
+        ${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}
+      </ul>
+
+      <h2>Cause</h2>
+      <p>${note.Cause || ''}</p>
+
+      <h2>Resolution</h2>
+      <p>${note.Resolution || ''}</p>
+
+      <h2>Additional Info</h2>
+      <ul>
+        <li><strong>DO:</strong> ${note["Additional Info"]?.DO || ''}</li>
+        <li><strong>WRICEF:</strong> ${note["Additional Info"]?.WRICEF || ''}</li>
+      </ul>
     </section>
+
     <div class="note-list">
       <button onclick="showSearch()">Back to Search</button>
     </div>
   `;
 }
 
-window.showSearch = function () {
+function showSearch() {
   document.getElementById('container').innerHTML = `
     <input type="text" id="searchBox" placeholder="Search KBAs...">
     <div id="results" class="note-list">Loading KBAs...</div>
@@ -118,9 +130,7 @@ document.getElementById("searchBox").addEventListener("input", e => {
   renderList(filtered);
 });
 
-// ✅ Start by loading the index
 loadIndex();
 </script>
 </body>
 </html>
-
