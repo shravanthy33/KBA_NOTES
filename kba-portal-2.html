@@ -37,30 +37,23 @@ ul { padding-left: 20px; }
 <script>
 const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
 
-async function loadIndex() {
-  try {
-    const res = await fetch(INDEX_URL);
-    const kbList = await res.json();
-    const aside = document.getElementById("kba-list");
-    aside.innerHTML = kbList.map(kba => 
-      `<a onclick="loadKBA('${kba.file}')">${kba.id}</a>`
-    ).join("");
-  } catch (err) {
-    document.getElementById("kba-list").innerHTML = "<p>Error loading index.json</p>";
-  }
-}
-
-async function loadKBA(fileName) {
+// Global loadKBA so onclick works
+window.loadKBA = async function(fileName) {
+  console.log("Clicked file:", fileName);
   const fileUrl = `${window.location.origin}/KBA_NOTES/${fileName}`;
+  console.log("Fetching:", fileUrl);
+
   try {
     const res = await fetch(fileUrl);
+    console.log("Fetch status:", res.status);
     if (!res.ok) throw new Error("Note not found");
     const note = await res.json();
+    console.log("Note loaded:", note);
     renderKBA(note);
   } catch (err) {
     document.getElementById("kba-content").innerHTML = `<div class="left-pane"><p>${err.message}</p></div>`;
   }
-}
+};
 
 function renderKBA(note) {
   const leftPane = document.createElement("div");
@@ -87,7 +80,6 @@ function renderKBA(note) {
   if (note.Images && note.Images.length) {
     rightPane.innerHTML = `<img src="${note.Images[0]}" alt="KBA Image">`;
   } else {
-    // If no image, make left pane full width
     leftPane.classList.add("full-width");
     rightPane.style.display = "none";
   }
@@ -97,6 +89,19 @@ function renderKBA(note) {
   contentDiv.appendChild(leftPane);
   if (note.Images && note.Images.length) {
     contentDiv.appendChild(rightPane);
+  }
+}
+
+async function loadIndex() {
+  try {
+    const res = await fetch(INDEX_URL);
+    const kbList = await res.json();
+    const aside = document.getElementById("kba-list");
+    aside.innerHTML = kbList.map(kba => 
+      `<a href="javascript:void(0)" onclick="loadKBA('${kba.file}')">${kba.id}</a>`
+    ).join("");
+  } catch (err) {
+    document.getElementById("kba-list").innerHTML = "<p>Error loading index.json</p>";
   }
 }
 
