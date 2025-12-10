@@ -8,28 +8,23 @@
 body { font-family: Arial, sans-serif; margin: 0; background-color: #f8f9fa; }
 header { background-color: #002b5c; color: white; padding: 1em; display: flex; justify-content: space-between; align-items: center; }
 nav a { color: white; margin-left: 1em; text-decoration: none; cursor: pointer; }
-.note-list, .note-metadata, .note-content { background: white; padding: 1em; margin: 1em; border-radius: 5px; }
-.note-list a { display: block; margin-bottom: 0.5em; color: #002b5c; text-decoration: none; cursor: pointer; }
-input { padding: 0.5em; width: 90%; margin: 1em; }
-h1, h2, h3 { color: #002b5c; }
-footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size: 0.9em; }
+.note-list a { display: block; padding: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #002b5c; cursor: pointer; }
+.note-list a:hover { background: #f0f0f0; }
 .note-container { display: flex; flex-wrap: wrap; gap: 1em; }
-.note-left { flex: 2; min-width: 300px; }
-.note-right { flex: 1; min-width: 250px; display: flex; justify-content: center; align-items: center; }
+.note-left { flex: 2; min-width: 300px; background: white; padding: 1em; border-radius: 5px; }
+.note-right { flex: 1; min-width: 250px; display: flex; justify-content: center; align-items: center; background: white; padding: 1em; border-radius: 5px; }
 .note-right img { max-width: 100%; max-height: 80vh; border: 1px solid #ccc; border-radius: 5px; }
 .full-width { flex: 1 1 100%; }
+h1, h2 { color: #002b5c; }
+ul { padding-left: 20px; }
 </style>
 </head>
 <body>
 <header>
   <div class="logo">Danfoss KBA</div>
-  <nav>
-    <a id="searchNav" href="#">Search</a>
-  </nav>
 </header>
 
 <main id="container">
-  <input type="text" id="searchBox" placeholder="Search KBAs...">
   <div id="results" class="note-list">Loading KBAs...</div>
 </main>
 
@@ -38,23 +33,89 @@ footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size:
 </footer>
 
 <script>
-console.log("✅ Script loaded");
-
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ DOM ready");
+  console.log("✅ DOM ready - loading index.json");
 
-  const results = document.getElementById("results");
-  results.innerHTML = `<a href="#" id="testLink">Test Link</a>`;
+  const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
+  let notesList = [];
 
-  document.getElementById("testLink").addEventListener("click", e => {
-    e.preventDefault();
-    console.log("✅ Test link clicked");
-    alert("You clicked the test link!");
+  // Load index.json and render clickable list
+  async function loadIndex() {
+    try {
+      const res = await fetch(INDEX_URL);
+      notesList = await res.json();
+      console.log("Index loaded:", notesList);
+      renderList(notesList);
+    } catch (err) {
+      console.error("Error loading index.json", err);
+      document.getElementById("results").innerHTML = "<p>Error loading index.json</p>";
+    }
+  }
+
+  function renderList(list) {
+    const results = document.getElementById("results");
+    results.innerHTML = list.map(note => 
+      `<a href="#" data-id="${note.id}">${note.id}</a>`
+    ).join("");
+  }
+
+  // Event delegation for clicks
+  document.getElementById("results").addEventListener("click", e => {
+    if (e.target.tagName === "A") {
+      e.preventDefault();
+      const noteId = e.target.getAttribute("data-id");
+      console.log("📌 Clicked note:", noteId);
+      loadNote(noteId);
+    }
   });
+
+  async function loadNote(noteId) {
+    const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`;
+    console.log("Fetching note from:", fileUrl);
+    try {
+      const response = await fetch(fileUrl);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const note = await response.json();
+      console.log("Note fetched:", note);
+      renderNote(note);
+    } catch (error) {
+      console.error("Error fetching note:", error);
+      document.getElementById('container').innerHTML = `<p>Note not found: ${noteId}</p>`;
+    }
+  }
+
+  function renderNote(note) {
+    const hasImage = note.Images && note.Images.length > 0;
+    document.getElementById('container').innerHTML = `
+      <div class="note-container">
+        <div class="note-left ${!hasImage ? 'full-width' : ''}">
+          <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
+          <p><strong>Date:</strong> ${note.Date || ''}</p>
+          <p><strong>Environment:</strong> ${note.Environment || ''}</p>
+          <p><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</p>
+          <h2>Description</h2><p>${note.Description || ''}</p>
+          <h2>Symptom</h2><p>${note.Symptom || ''}</p>
+          <h2>Reproducing the Issue</h2>
+          <ul>${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}</ul>
+          <h2>Cause</h2><p>${note.Cause || ''}</p>
+          <h2>Resolution</h2><p>${note.Resolution || ''}</p>
+          <h2>Additional Info</h2>
+          <ul>
+            ${note["Additional Info"] ? Object.entries(note["Additional Info"]).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('') : ''}
+          </ul>
+          <button id="backBtn">Back to Search</button>
+        </div>
+        ${hasImage ? `<div class="note-right"><img src="${note.Images[0]}" alt="KBA Image"></div>` : ''}
+      </div>
+    `;
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      renderList(notesList);
+    });
+  }
+
+  loadIndex();
 });
 </script>
 </body>
 </html>
-
-
-
