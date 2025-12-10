@@ -5,20 +5,152 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Danfoss KBA Search & Viewer</title>
 <style>
-body { font-family: Arial, sans-serif; margin: 0; background-color: #f8f9fa; }
-header { background-color: #002b5c; color: white; padding: 1em; display: flex; justify-content: space-between; align-items: center; }
-.note-list a { display: block; padding: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #002b5c; cursor: pointer; }
-.note-list a:hover { background: #f0f0f0; }
-.note-container { display: flex; flex-wrap: wrap; gap: 1em; height: 80vh; }
-.note-left { flex: 2; min-width: 300px; background: white; padding: 1em; border-radius: 5px; overflow-y: auto; }
-.note-right { flex: 1; min-width: 250px; background: white; padding: 1em; border-radius: 5px; overflow: auto; position: relative; }
-.note-right img { max-width: none; max-height: none; cursor: grab; }
-.full-width { flex: 1 1 100%; }
-h1, h2 { color: #002b5c; }
-ul { padding-left: 20px; }
-.zoom-controls { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.8); padding: 5px; border-radius: 5px; display: flex; gap: 5px; }
-.zoom-controls button { padding: 5px; cursor: pointer; }
+/* Base styling */
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  margin: 0;
+  background: linear-gradient(to bottom right, #f0f4f8, #e6ebf0);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  background-color: #002b5c;
+  color: white;
+  padding: 1em;
+  font-size: 1.2em;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Main container */
+main {
+  flex: 1;
+  padding: 1em;
+}
+
+/* List styling */
+.note-list a {
+  display: block;
+  padding: 10px;
+  margin-bottom: 5px;
+  background: white;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #002b5c;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.note-list a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  background: #f9fbfd;
+}
+
+/* Note container */
+.note-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  height: auto;
+}
+
+/* Left pane */
+.note-left {
+  flex: 2;
+  min-width: 300px;
+  background: white;
+  padding: 1.5em;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  overflow-y: auto;
+}
+
+/* Right pane - increased width */
+.note-right {
+  flex: 1.5; /* increased from 1 to 1.5 */
+  min-width: 350px;
+  background: white;
+  padding: 1em;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  overflow: auto;
+  position: relative;
+}
+
+/* Image styling */
+.note-right img {
+  max-width: none;
+  max-height: none;
+  cursor: grab;
+  border-radius: 5px;
+}
+
+/* Full width if no image */
+.full-width {
+  flex: 1 1 100%;
+}
+
+/* Headings */
+h1 {
+  color: #002b5c;
+  margin-top: 0;
+}
+h2 {
+  color: #004080;
+  margin-top: 1em;
+}
+
+/* Zoom controls */
+.zoom-controls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.9);
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+  gap: 5px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.zoom-controls button {
+  padding: 5px 8px;
+  cursor: pointer;
+  border: none;
+  background: #002b5c;
+  color: white;
+  border-radius: 4px;
+}
+.zoom-controls button:hover {
+  background: #004080;
+}
+
+/* Footer fixed to bottom if short content */
+footer {
+  background-color: #002b5c;
+  color: white;
+  text-align: center;
+  padding: 0.8em;
+  font-size: 0.9em;
+  margin-top: auto;
+}
 .hidden { display: none; }
+
+/* Back button styling */
+#backBtn {
+  background: #002b5c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 1em;
+}
+#backBtn:hover {
+  background: #004080;
+}
 </style>
 </head>
 <body>
@@ -39,7 +171,7 @@ ul { padding-left: 20px; }
 </main>
 
 <footer>
-  <p>&copy; 2025 Danfoss. All rights reserved.</p>
+  <p>© 2025 Danfoss. All rights reserved.</p>
 </footer>
 
 <script>
@@ -106,6 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('noteContent').innerHTML = `
       <div class="note-container">
         <div class="note-left ${!hasImage ? 'full-width' : ''}">
+          <button id="backBtn">← Back to Search</button>
           <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
           <p><strong>Date:</strong> ${note.Date || ''}</p>
           <p><strong>Environment:</strong> ${note.Environment || ''}</p>
@@ -120,7 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <ul>
             ${note["Additional Info"] ? Object.entries(note["Additional Info"]).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('') : ''}
           </ul>
-          <button id="backBtn">Back to Search</button>
         </div>
         ${hasImage ? `
         <div class="note-right" id="imageContainer">
@@ -142,7 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (hasImage) {
       let scale = 1;
       let isDragging = false;
-      let startX, startY;
       const zoomImg = document.getElementById("zoomImg");
       const imageContainer = document.getElementById("imageContainer");
 
@@ -163,28 +294,14 @@ document.addEventListener("DOMContentLoaded", () => {
         imageContainer.scrollLeft = 0;
       });
 
-      zoomImg.addEventListener("mousedown", e => {
-        isDragging = true;
-        startX = e.pageX - imageContainer.offsetLeft;
-        startY = e.pageY - imageContainer.offsetTop;
-        zoomImg.style.cursor = "grabbing";
-      });
-
-      zoomImg.addEventListener("mouseup", () => {
-        isDragging = false;
-        zoomImg.style.cursor = "grab";
-      });
-
-      zoomImg.addEventListener("mouseleave", () => {
-        isDragging = false;
-        zoomImg.style.cursor = "grab";
-      });
-
+      zoomImg.addEventListener("mousedown", () => { isDragging = true; zoomImg.style.cursor = "grabbing"; });
+      zoomImg.addEventListener("mouseup", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
+      zoomImg.addEventListener("mouseleave", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
       zoomImg.addEventListener("mousemove", e => {
         if (!isDragging) return;
         e.preventDefault();
-        imageContainer.scrollLeft -= (e.movementX);
-        imageContainer.scrollTop -= (e.movementY);
+        imageContainer.scrollLeft -= e.movementX;
+        imageContainer.scrollTop -= e.movementY;
       });
     }
   }
