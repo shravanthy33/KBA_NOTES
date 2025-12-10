@@ -39,9 +39,32 @@ let notesList = [];
 async function loadIndex() {
   try {
     const res = await fetch(INDEX_URL);
-    notesList = await res.json();
+    const ids = await res.json(); // index.json should just have IDs
+    notesList = [];
+
+    // Fetch each JSON file to get its Title
+    for (let entry of ids) {
+      const fileUrl = `${window.location.origin}/KBA_NOTES/${entry.id}.json`;
+      try {
+        const noteRes = await fetch(fileUrl);
+        if (!noteRes.ok) throw new Error(`HTTP error! status: ${noteRes.status}`);
+        const noteData = await noteRes.json();
+        notesList.push({
+          id: entry.id,
+          title: noteData.Title || entry.title || "Untitled KBA"
+        });
+      } catch (err) {
+        console.error(`Error loading ${entry.id}.json`, err);
+        notesList.push({
+          id: entry.id,
+          title: entry.title || "Untitled KBA"
+        });
+      }
+    }
+
     renderList(notesList);
   } catch (err) {
+    console.error("Error loading index.json", err);
     document.getElementById("results").innerHTML = "<p>Error loading index.json</p>";
   }
 }
@@ -134,3 +157,4 @@ loadIndex();
 </script>
 </body>
 </html>
+
