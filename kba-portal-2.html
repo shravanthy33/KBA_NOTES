@@ -11,11 +11,13 @@ header { background-color: #002b5c; color: white; padding: 1em; display: flex; j
 .note-list a:hover { background: #f0f0f0; }
 .note-container { display: flex; flex-wrap: wrap; gap: 1em; }
 .note-left { flex: 2; min-width: 300px; background: white; padding: 1em; border-radius: 5px; }
-.note-right { flex: 1; min-width: 250px; display: flex; justify-content: center; align-items: center; background: white; padding: 1em; border-radius: 5px; }
-.note-right img { max-width: 100%; max-height: 80vh; border: 1px solid #ccc; border-radius: 5px; }
+.note-right { flex: 1; min-width: 250px; display: flex; justify-content: center; align-items: center; background: white; padding: 1em; border-radius: 5px; overflow: hidden; position: relative; }
+.note-right img { max-width: 100%; max-height: 80vh; border: 1px solid #ccc; border-radius: 5px; transition: transform 0.2s ease; cursor: zoom-in; }
 .full-width { flex: 1 1 100%; }
 h1, h2 { color: #002b5c; }
 ul { padding-left: 20px; }
+.zoom-controls { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.8); padding: 5px; border-radius: 5px; display: flex; gap: 5px; }
+.zoom-controls button { padding: 5px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -41,8 +43,25 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadIndex() {
     try {
       const res = await fetch(INDEX_URL);
-      notesList = await res.json();
-      console.log("Index loaded:", notesList);
+      const ids = await res.json();
+      notesList = [];
+
+      for (let entry of ids) {
+        const fileUrl = `${window.location.origin}/KBA_NOTES/${entry.id}.json`;
+        try {
+          const noteRes = await fetch(fileUrl);
+          if (!noteRes.ok) throw new Error(`HTTP error! status: ${noteRes.status}`);
+          const noteData = await noteRes.json();
+          notesList.push({
+            id: entry.id,
+            title: noteData.Title || "Untitled KBA"
+          });
+        } catch (err) {
+          console.error(`Error loading ${entry.id}.json`, err);
+          notesList.push({ id: entry.id, title: "Untitled KBA" });
+        }
+      }
+
       renderList(notesList);
     } catch (err) {
       console.error("Error loading index.json", err);
@@ -53,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderList(list) {
     const results = document.getElementById("results");
     results.innerHTML = list.map(note => 
-      `<a href="#" data-id="${note.id}">${note.id}</a>`
+      `<a href="#" data-id="${note.id}">${note.title}</a>`
     ).join("");
   }
 
@@ -102,13 +121,43 @@ document.addEventListener("DOMContentLoaded", () => {
           </ul>
           <button id="backBtn">Back to Search</button>
         </div>
-        ${hasImage ? `<div class="note-right"><img src="${note.Images[0]}" alt="KBA Image"></div>` : ''}
+        ${hasImage ? `
+        <div class="note-right">
+          <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image">
+          <div class="zoom-controls">
+            <button id="zoomIn">+</button>
+            <button id="zoomOut">-</button>
+            <button id="resetZoom">Reset</button>
+          </div>
+        </div>` : ''}
       </div>
     `;
 
+    // Back button
     document.getElementById("backBtn").addEventListener("click", () => {
       renderList(notesList);
     });
+
+    // Zoom functionality
+    if (hasImage) {
+      let scale = 1;
+      const zoomImg = document.getElementById("zoomImg");
+
+      document.getElementById("zoomIn").addEventListener("click", () => {
+        scale += 0.2;
+        zoomImg.style.transform = `scale(${scale})`;
+      });
+
+      document.getElementById("zoomOut").addEventListener("click", () => {
+        scale = Math.max(1, scale - 0.2);
+        zoomImg.style.transform = `scale(${scale})`;
+      });
+
+      document.getElementById("resetZoom").addEventListener("click", () => {
+        scale = 1;
+        zoomImg.style.transform = `scale(${scale})`;
+      });
+    }
   }
 
   loadIndex();
