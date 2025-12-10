@@ -119,6 +119,13 @@ function renderNote(note) {
         <li><strong>DO:</strong> ${note["Additional Info"]?.DO || ''}</li>
         <li><strong>WRICEF:</strong> ${note["Additional Info"]?.WRICEF || ''}</li>
       </ul>
+
+      ${note.Images && note.Images.length ? `
+        <h2>Images</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          ${note.Images.map(img => `<img src="${img}" alt="KBA Image" style="max-width:300px;border:1px solid #ccc;border-radius:4px;">`).join('')}
+        </div>
+      ` : ''}
     </section>
 
     <div class="note-list">
@@ -154,3 +161,4 @@ loadIndex();
 </script>
 </body>
 </html>
+
