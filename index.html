@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danfoss KBA Search & Viewer</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; background-color: #f8f9fa; }
+header { background-color: #002b5c; color: white; padding: 1em; display: flex; justify-content: space-between; align-items: center; }
+nav a { color: white; margin-left: 1em; text-decoration: none; }
+.note-list, .note-metadata, .note-content { background: white; padding: 1em; margin: 1em; border-radius: 5px; }
+.note-list a { display: block; margin-bottom: 0.5em; color: #002b5c; text-decoration: none; cursor: pointer; }
+input { padding: 0.5em; width: 90%; margin: 1em; }
+h1, h2, h3 { color: #002b5c; }
+footer { background-color: #e9ecef; text-align: center; padding: 1em; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Danfoss KBA</div>
+  <nav>
+    <a href="#" onclick="showSearch()">Search</a>
+  </nav>
+</header>
+
+<main id="container">
+  <input type="text" id="searchBox" placeholder="Search KBAs...">
+  <div id="results" class="note-list">Loading KBAs...</div>
+</main>
+
+<footer>
+  <p>&copy; 2025 Danfoss. All rights reserved.</p>
+</footer>
+
+<script>
+// URL to index.json in your repo root
+const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
+let notesList = [];
+
+async function loadIndex() {
+  try {
+    const res = await fetch(INDEX_URL);
+    notesList = await res.json();
+    renderList(notesList);
+  } catch (err) {
+    document.getElementById("results").innerHTML = "<p>Error loading index.json</p>";
+  }
+}
+
+function renderList(list) {
+  const results = document.getElementById("results");
+  results.innerHTML = list.map(note => 
+    `<a onclick="loadNote('${note.id}')">${note.id} - ${note.title}</a>`
+  ).join("");
+}
+
+document.addEventListener("input", e => {
+  if (e.target.id === "searchBox") {
+    const query = e.target.value.toLowerCase();
+    const filtered = notesList.filter(note => 
+      note.id.includes(query) || note.title.toLowerCase().includes(query)
+    );
+    renderList(filtered);
+  }
+});
+
+async function loadNote(noteId) {
+  const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`; // ✅ correct path
+  try {
+    const response = await fetch(fileUrl);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const note = await response.json();
+    renderNote(note);
+  } catch (error) {
+    document.getElementById('container').innerHTML = `<p>Note not found: ${noteId}</p>`;
+  }
+}
+
+function renderNote(note) {
+  document.getElementById('container').innerHTML = `
+    <section class="note-metadata">
+      <h1>${note.note_number}: ${note.title}</h1>
+      <ul>
+        <li><strong>Status:</strong> ${note.status}</li>
+        <li><strong>Priority:</strong> ${note.priority}</li>
+        <li><strong>Component:</strong> ${note.component}</li>
+        <li><strong>Validity:</strong> ${note.validity.from} to ${note.validity.to}</li>
+      </ul>
+    </section>
+    <section class="note-content">
+      <h2>Symptom</h2><p>${note.symptom}</p>
+      <h2>Cause</h2><p>${note.cause}</p>
+      <h2>Solution</h2><p>${note.solution}</p>
+    </section>
+    <div class="note-list">
+      <button onclick="showSearch()">Back to Search</button>
+    </div>
+  `;
+}
+
+function showSearch() {
+  document.getElementById('container').innerHTML = `
+    <input type="text" id="searchBox" placeholder="Search KBAs...">
+    <div id="results" class="note-list">Loading KBAs...</div>
+  `;
+  renderList(notesList);
+}
+
+// Load index.json on page start
+loadIndex();
+</script>
+</body>
+</html>
