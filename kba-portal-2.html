@@ -20,7 +20,9 @@ header {
   font-size: 1.2em;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-main { flex: 1; padding: 1em; }
+main { flex: 1; padding: 1em; display: flex; gap: 1em; }
+.left-pane { flex: 3; }
+.right-pane { flex: 1; background: white; padding: 1em; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 .search-bar {
   margin-bottom: 1em;
   display: flex;
@@ -36,18 +38,17 @@ main { flex: 1; padding: 1em; }
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 1em;
 }
 .tile {
-  background: white;
+  background: #f9fbfd;
   padding: 10px;
   border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   cursor: pointer;
-  min-width: 150px;
+  min-width: 120px;
   text-align: center;
 }
-.tile:hover { background: #f9fbfd; }
+.tile:hover { background: #e6ebf0; }
 .note-list a {
   display: block;
   padding: 10px;
@@ -59,14 +60,11 @@ main { flex: 1; padding: 1em; }
   font-weight: 500;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-.note-list a:hover {
-  background: #f9fbfd;
-}
+.note-list a:hover { background: #f9fbfd; }
 .note-container {
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
-  height: auto;
 }
 .note-left {
   flex: 2;
@@ -88,6 +86,7 @@ main { flex: 1; padding: 1em; }
   position: relative;
 }
 .note-right img {
+  margin-top: 10cm; /* move image down */
   max-width: none;
   max-height: none;
   cursor: grab;
@@ -143,17 +142,22 @@ footer {
 </header>
 
 <main>
-  <!-- List View -->
-  <div id="listView">
+  <!-- Left pane: List View -->
+  <div class="left-pane" id="listView">
     <div class="search-bar">
       <input type="text" id="searchInput" placeholder="Search KBAs...">
     </div>
-    <div id="tiles" class="tiles"></div>
     <div id="results" class="note-list">Loading KBAs...</div>
   </div>
 
+  <!-- Right pane: Frequently searched -->
+  <div class="right-pane">
+    <h3>Frequently Searched Notes</h3>
+    <div id="tiles" class="tiles"></div>
+  </div>
+
   <!-- Note View -->
-  <div id="noteView" class="hidden">
+  <div id="noteView" class="hidden" style="width: 100%;">
     <div id="noteContent"></div>
   </div>
 </main>
@@ -164,7 +168,7 @@ footer {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
+  const INDEX_URL = `${window.location.origin}/KBA_NOTES/JSON/index.json`;
   let notesList = [];
   let searchHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]");
 
@@ -253,6 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderNote(note) {
     const hasImage = note.Images && note.Images.length > 0;
     document.getElementById('listView').classList.add('hidden');
+    document.querySelector('.right-pane').classList.add('hidden');
     document.getElementById('noteView').classList.remove('hidden');
 
     document.getElementById('noteContent').innerHTML = `
@@ -276,12 +281,15 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         ${hasImage ? `
         <div class="note-right" id="imageContainer">
-          <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image">
           <div class="zoom-controls">
             <button id="zoomIn">+</button>
             <button id="zoomOut">-</button>
             <button id="resetZoom">Reset</button>
+            <a id="downloadImg" href="${window.location.origin}/KBA_NOTES/Images/KLT_BMW.jpg" download>
+              <button>Download</button>
+            </a>
           </div>
+          <img id="zoomImg" src="${window.location.origin}/KBA_NOTES/Images/KLT_BMW.jpg" alt="KBA Image">
         </div>` : ''}
       </div>
     `;
@@ -289,6 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("backBtn").addEventListener("click", () => {
       document.getElementById('noteView').classList.add('hidden');
       document.getElementById('listView').classList.remove('hidden');
+      document.querySelector('.right-pane').classList.remove('hidden');
     });
 
     if (hasImage) {
@@ -331,4 +340,3 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
-
