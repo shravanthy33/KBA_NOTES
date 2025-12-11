@@ -285,15 +285,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <button id="zoomIn">+</button>
             <button id="zoomOut">-</button>
             <button id="resetZoom">Reset</button>
-            <a id="downloadImg" href="${window.location.origin}/KBA_NOTES/Images/KLT_BMW.jpg" download>
-              <button>Download</button>
-            </a>
-          </div>
-          <img id="zoomImg" src="${window.location.origin}/KBA_NOTES/Images/KLT_BMW.jpg" alt="KBA Image">
+           <a id="downloadImg" href="${note.Images && note.Images.length ? note.Images[0] : ''}" download>
+  <button>Download</button>
+</a>
+<img id="zoomImg" src="${note.Images && note.Images.length ? note.Images[0] : ''}" alt="KBA Image">
         </div>` : ''}
-      </div>
-    `;
-
+  
     document.getElementById("backBtn").addEventListener("click", () => {
       document.getElementById('noteView').classList.add('hidden');
       document.getElementById('listView').classList.remove('hidden');
@@ -340,3 +337,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
