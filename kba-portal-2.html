@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const ids = await res.json();
       notesList = [];
       for (let entry of ids) {
-        const fileUrl = `${window.location.origin}/KBA_NOTES/${entry.id}.json`;
+        const fileUrl = `${window.location.origin}/KBA_NOTES/JSON/${entry.id}.json`;
         try {
           const noteRes = await fetch(fileUrl);
           if (!noteRes.ok) throw new Error();
@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   async function loadNote(noteId) {
-    const fileUrl = `${window.location.origin}/KBA_NOTES/${noteId}.json`;
+    const fileUrl = `${window.location.origin}/KBA_NOTES/JSON/${noteId}.json`;
     try {
       const response = await fetch(fileUrl);
       if (!response.ok) throw new Error();
@@ -331,3 +331,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
