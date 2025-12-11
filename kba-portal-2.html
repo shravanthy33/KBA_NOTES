@@ -86,7 +86,7 @@ main { flex: 1; padding: 1em; display: flex; gap: 1em; }
   position: relative;
 }
 .note-right img {
-  margin-top: 10cm; /* move image down */
+  margin-top: 5cm; /* move image down */
   max-width: none;
   max-height: none;
   cursor: grab;
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
            <a id="downloadImg" href="${note.Images && note.Images.length ? note.Images[0] : ''}" download>
   <button>Download</button>
 </a>
-<img id="zoomImg" src="${note.Images && note.Images.length ? note.Images[0] : ''}" alt="KBA Image">
+<img id="zoomImg" src="${note.Images && note.Images.length ? note.Images[0] : ''}" alt="KBA Image" style="margin-top:5cm;">
         </div>` : ''}
   
     document.getElementById("backBtn").addEventListener("click", () => {
@@ -337,4 +337,5 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
