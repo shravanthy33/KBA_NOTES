@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Danfoss KBA Search & Viewer</title>
 <style>
-/* Base styling */
 body {
   font-family: 'Segoe UI', Tahoma, sans-serif;
   margin: 0;
@@ -14,8 +13,6 @@ body {
   flex-direction: column;
   min-height: 100vh;
 }
-
-/* Header */
 header {
   background-color: #002b5c;
   color: white;
@@ -23,14 +20,34 @@ header {
   font-size: 1.2em;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-
-/* Main container */
-main {
-  flex: 1;
-  padding: 1em;
+main { flex: 1; padding: 1em; }
+.search-bar {
+  margin-bottom: 1em;
+  display: flex;
+  gap: 10px;
 }
-
-/* List styling */
+.search-bar input {
+  padding: 8px;
+  flex: 1;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+.tiles {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 1em;
+}
+.tile {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  cursor: pointer;
+  min-width: 150px;
+  text-align: center;
+}
+.tile:hover { background: #f9fbfd; }
 .note-list a {
   display: block;
   padding: 10px;
@@ -41,23 +58,16 @@ main {
   color: #002b5c;
   font-weight: 500;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .note-list a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
   background: #f9fbfd;
 }
-
-/* Note container */
 .note-container {
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
   height: auto;
 }
-
-/* Left pane */
 .note-left {
   flex: 2;
   min-width: 300px;
@@ -67,10 +77,8 @@ main {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   overflow-y: auto;
 }
-
-/* Right pane - increased width */
 .note-right {
-  flex: 1.5; /* increased from 1 to 1.5 */
+  flex: 1.5;
   min-width: 350px;
   background: white;
   padding: 1em;
@@ -79,34 +87,18 @@ main {
   overflow: auto;
   position: relative;
 }
-
-/* Image styling */
 .note-right img {
   max-width: none;
   max-height: none;
   cursor: grab;
   border-radius: 5px;
 }
-
-/* Full width if no image */
-.full-width {
-  flex: 1 1 100%;
-}
-
-/* Headings */
-h1 {
-  color: #002b5c;
-  margin-top: 0;
-}
-h2 {
-  color: #004080;
-  margin-top: 1em;
-}
-
-/* Zoom controls */
+.full-width { flex: 1 1 100%; }
+h1, h2 { color: #002b5c; }
+ul { padding-left: 20px; }
 .zoom-controls {
   position: absolute;
-  bottom: 10px;
+  top: 10px;
   right: 10px;
   background: rgba(255,255,255,0.9);
   padding: 5px;
@@ -123,11 +115,7 @@ h2 {
   color: white;
   border-radius: 4px;
 }
-.zoom-controls button:hover {
-  background: #004080;
-}
-
-/* Footer fixed to bottom if short content */
+.zoom-controls button:hover { background: #004080; }
 footer {
   background-color: #002b5c;
   color: white;
@@ -137,8 +125,6 @@ footer {
   margin-top: auto;
 }
 .hidden { display: none; }
-
-/* Back button styling */
 #backBtn {
   background: #002b5c;
   color: white;
@@ -148,9 +134,7 @@ footer {
   cursor: pointer;
   margin-bottom: 1em;
 }
-#backBtn:hover {
-  background: #004080;
-}
+#backBtn:hover { background: #004080; }
 </style>
 </head>
 <body>
@@ -161,6 +145,10 @@ footer {
 <main>
   <!-- List View -->
   <div id="listView">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search KBAs...">
+    </div>
+    <div id="tiles" class="tiles"></div>
     <div id="results" class="note-list">Loading KBAs...</div>
   </div>
 
@@ -178,42 +166,62 @@ footer {
 document.addEventListener("DOMContentLoaded", () => {
   const INDEX_URL = `${window.location.origin}/KBA_NOTES/index.json`;
   let notesList = [];
+  let searchHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]");
 
   async function loadIndex() {
     try {
       const res = await fetch(INDEX_URL);
       const ids = await res.json();
       notesList = [];
-
       for (let entry of ids) {
         const fileUrl = `${window.location.origin}/KBA_NOTES/${entry.id}.json`;
         try {
           const noteRes = await fetch(fileUrl);
-          if (!noteRes.ok) throw new Error(`HTTP error! status: ${noteRes.status}`);
+          if (!noteRes.ok) throw new Error();
           const noteData = await noteRes.json();
-          notesList.push({
-            id: entry.id,
-            title: noteData.Title || "Untitled KBA"
-          });
+          notesList.push({ id: entry.id, title: noteData.Title || "Untitled KBA" });
         } catch {
           notesList.push({ id: entry.id, title: "Untitled KBA" });
         }
       }
       renderList(notesList);
+      renderTiles();
     } catch {
       document.getElementById("results").innerHTML = "<p>Error loading index.json</p>";
     }
   }
 
   function renderList(list) {
-    document.getElementById("results").innerHTML = list.map(note => 
+    document.getElementById("results").innerHTML = list.map(note =>
       `<a href="#" data-id="${note.id}">${note.title}</a>`
     ).join("");
   }
 
+  function renderTiles() {
+    const tilesContainer = document.getElementById("tiles");
+    const sorted = [...searchHistory].sort((a,b) => b.count - a.count).slice(0,5);
+    tilesContainer.innerHTML = sorted.map(item =>
+      `<div class="tile" data-id="${item.id}">${item.title}</div>`
+    ).join("");
+  }
+
+  document.getElementById("searchInput").addEventListener("input", e => {
+    const query = e.target.value.toLowerCase();
+    const filtered = notesList.filter(note =>
+      note.title.toLowerCase().includes(query) || note.id.includes(query)
+    );
+    renderList(filtered);
+  });
+
   document.getElementById("results").addEventListener("click", e => {
     if (e.target.tagName === "A") {
       e.preventDefault();
+      loadNote(e.target.getAttribute("data-id"));
+    }
+  });
+
+  document.getElementById("tiles").addEventListener("click", e => {
+    if (e.target.classList.contains("tile")) {
       loadNote(e.target.getAttribute("data-id"));
     }
   });
@@ -224,10 +232,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(fileUrl);
       if (!response.ok) throw new Error();
       const note = await response.json();
+      addToSearchHistory(noteId, note.Title);
       renderNote(note);
     } catch {
       document.getElementById('noteContent').innerHTML = `<p>Note not found: ${noteId}</p>`;
     }
+  }
+
+  function addToSearchHistory(id, title) {
+    const existing = searchHistory.find(item => item.id === id);
+    if (existing) {
+      existing.count++;
+    } else {
+      searchHistory.push({ id, title, count: 1 });
+    }
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+    renderTiles();
   }
 
   function renderNote(note) {
