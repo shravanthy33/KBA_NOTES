@@ -254,88 +254,94 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTiles();
   }
 
-  function renderNote(note) {
-    const hasImage = note.Images && note.Images.length > 0;
-    document.getElementById('listView').classList.add('hidden');
-    document.querySelector('.right-pane').classList.add('hidden');
-    document.getElementById('noteView').classList.remove('hidden');
+function renderNote(note) {
+  const hasImage = note.Images && note.Images.length > 0;
+  document.getElementById('listView').classList.add('hidden');
+  document.querySelector('.right-pane').classList.add('hidden');
+  document.getElementById('noteView').classList.remove('hidden');
 
-    document.getElementById('noteContent').innerHTML = `
-      <div class="note-container">
-        <div class="note-left ${!hasImage ? 'full-width' : ''}">
-          <button id="backBtn">← Back to Search</button>
-          <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
-          <p><strong>Date:</strong> ${note.Date || ''}</p>
-          <p><strong>Environment:</strong> ${note.Environment || ''}</p>
-          <p><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</p>
-          <h2>Description</h2><p>${note.Description || ''}</p>
-          <h2>Symptom</h2><p>${note.Symptom || ''}</p>
-          <h2>Reproducing the Issue</h2>
-          <ul>${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}</ul>
-          <h2>Cause</h2><p>${note.Cause || ''}</p>
-          <h2>Resolution</h2><p>${note.Resolution || ''}</p>
-          <h2>Additional Info</h2>
-          <ul>
-            ${note["Additional Info"] ? Object.entries(note["Additional Info"]).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('') : ''}
-          </ul>
+  // HTML content
+  document.getElementById('noteContent').innerHTML = `
+    <div class="note-container">
+      <div class="note-left ${!hasImage ? 'full-width' : ''}">
+        <button id="backBtn">← Back to Search</button>
+        <h1>${note.KBA || ''}: ${note.Title || ''}</h1>
+        <p><strong>Date:</strong> ${note.Date || ''}</p>
+        <p><strong>Environment:</strong> ${note.Environment || ''}</p>
+        <p><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</p>
+        <h2>Description</h2><p>${note.Description || ''}</p>
+        <h2>Symptom</h2><p>${note.Symptom || ''}</p>
+        <h2>Reproducing the Issue</h2>
+        <ul>${(note["Reproducing the Issue"] || []).map(step => `<li>${step}</li>`).join('')}</ul>
+        <h2>Cause</h2><p>${note.Cause || ''}</p>
+        <h2>Resolution</h2><p>${note.Resolution || ''}</p>
+        <h2>Additional Info</h2>
+        <ul>
+          ${note["Additional Info"] ? Object.entries(note["Additional Info"]).map(([k,v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('') : ''}
+        </ul>
+      </div>
+      ${hasImage ? `
+      <div class="note-right" id="imageContainer">
+        <div class="zoom-controls">
+          <button id="zoomIn">+</button>
+          <button id="zoomOut">-</button>
+          <button id="resetZoom">Reset</button>
+          <a id="downloadImg" href="${note.Images[0]}" download>
+            <button>Download</button>
+          </a>
         </div>
-        ${hasImage ? `
-        <div class="note-right" id="imageContainer">
-          <div class="zoom-controls">
-            <button id="zoomIn">+</button>
-            <button id="zoomOut">-</button>
-            <button id="resetZoom">Reset</button>
-           <a id="downloadImg" href="${note.Images && note.Images.length ? note.Images[0] : ''}" download>
-  <button>Download</button>
-</a>
-<img id="zoomImg" src="${note.Images && note.Images.length ? note.Images[0] : ''}" alt="KBA Image" style="margin-top:5cm;">
-        </div>` : ''}
-  
-    document.getElementById("backBtn").addEventListener("click", () => {
-      document.getElementById('noteView').classList.add('hidden');
-      document.getElementById('listView').classList.remove('hidden');
-      document.querySelector('.right-pane').classList.remove('hidden');
+        <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image" style="margin-top:5cm;">
+      </div>` : ''}
+    </div>
+  `; // ✅ close template literal here
+
+  // JS logic outside of the string
+  document.getElementById("backBtn").addEventListener("click", () => {
+    document.getElementById('noteView').classList.add('hidden');
+    document.getElementById('listView').classList.remove('hidden');
+    document.querySelector('.right-pane').classList.remove('hidden');
+  });
+
+  if (hasImage) {
+    let scale = 1;
+    let isDragging = false;
+    const zoomImg = document.getElementById("zoomImg");
+    const imageContainer = document.getElementById("imageContainer");
+
+    document.getElementById("zoomIn").addEventListener("click", () => {
+      scale += 0.2;
+      zoomImg.style.transform = `scale(${scale})`;
     });
 
-    if (hasImage) {
-      let scale = 1;
-      let isDragging = false;
-      const zoomImg = document.getElementById("zoomImg");
-      const imageContainer = document.getElementById("imageContainer");
+    document.getElementById("zoomOut").addEventListener("click", () => {
+      scale = Math.max(1, scale - 0.2);
+      zoomImg.style.transform = `scale(${scale})`;
+    });
 
-      document.getElementById("zoomIn").addEventListener("click", () => {
-        scale += 0.2;
-        zoomImg.style.transform = `scale(${scale})`;
-      });
+    document.getElementById("resetZoom").addEventListener("click", () => {
+      scale = 1;
+      zoomImg.style.transform = `scale(${scale}) translate(0,0)`;
+      imageContainer.scrollTop = 0;
+      imageContainer.scrollLeft = 0;
+    });
 
-      document.getElementById("zoomOut").addEventListener("click", () => {
-        scale = Math.max(1, scale - 0.2);
-        zoomImg.style.transform = `scale(${scale})`;
-      });
-
-      document.getElementById("resetZoom").addEventListener("click", () => {
-        scale = 1;
-        zoomImg.style.transform = `scale(${scale}) translate(0,0)`;
-        imageContainer.scrollTop = 0;
-        imageContainer.scrollLeft = 0;
-      });
-
-      zoomImg.addEventListener("mousedown", () => { isDragging = true; zoomImg.style.cursor = "grabbing"; });
-      zoomImg.addEventListener("mouseup", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
-      zoomImg.addEventListener("mouseleave", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
-      zoomImg.addEventListener("mousemove", e => {
-        if (!isDragging) return;
-        e.preventDefault();
-        imageContainer.scrollLeft -= e.movementX;
-        imageContainer.scrollTop -= e.movementY;
-      });
-    }
+    zoomImg.addEventListener("mousedown", () => { isDragging = true; zoomImg.style.cursor = "grabbing"; });
+    zoomImg.addEventListener("mouseup", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
+    zoomImg.addEventListener("mouseleave", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
+    zoomImg.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      imageContainer.scrollLeft -= e.movementX;
+      imageContainer.scrollTop -= e.movementY;
+    });
   }
+}
 
   loadIndex();
 });
 </script>
 </body>
 </html>
+
 
 
