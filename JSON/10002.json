@@ -1,4 +1,3 @@
-
 {
   "Title": "KLT Label for BMW",
   "KBA": "10002",
@@ -17,5 +16,8 @@
     "Trigger": "KLT label is triggered on manual print from /scwm/pack transaction",
     "DO": "4340",
     "WRICEF": "RO-MM-WH-1818"
-  }
+  },
+  "Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/KLT_BMW.jpg"
+  ]
 }
