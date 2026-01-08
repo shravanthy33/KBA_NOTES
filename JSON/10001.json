@@ -4,17 +4,19 @@
   "KBA": "10001",
   "Date": "2025-12-04 10:07:47",
   "Description": "WT label needs to be printed on Warehouse task creation or confirmation",
-  "Symptom": "WT labels not getting printed",
+  "Condition To Print": "Maintain the condition record in tcode /SCWM/PRWO6",
   "Environment": "EWM 2020; Embedded EWM",
-  "Reproducing the Issue": [
+  "Steps To Print": [
     "Create a warehouse order",
-    "When Warehouse task is created or confirmed label is expected"
+    "When Warehouse task is created/ confirmed based on condition record maintenance label is printed"
   ],
-  "Cause": "Missing condition record",
-  "Resolution": "Create a condition record in tcode /scwm/prhu6",
-  "Action Definition": "Z_WT_CONF_LBL",
+  "When It Prints": "Label is printed during Warehouse task creation/confirmation in both inbound/outbound process",
+  "Size": "4X3 Label",
+  "Action Definition": "Z_WT_CONF_LBL_4X3",
   "Additional Info": {
     "DO": "0659",
     "WRICEF": "RO-MM-WH-1765"
+    "Printer": "1. Determination from conditon record 2. Can be maintained in user parameter with param id ZRF_PRINTER"
   }
 }
+
