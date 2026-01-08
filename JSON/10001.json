@@ -15,8 +15,9 @@
   "Action Definition": "Z_WT_CONF_LBL_4X3",
   "Additional Info": {
     "DO": "0659",
-    "WRICEF": "RO-MM-WH-1765"
+    "WRICEF": "RO-MM-WH-1765",
     "Printer": "1. Determination from conditon record 2. Can be maintained in user parameter with param id ZRF_PRINTER"
   }
 }
+
 
