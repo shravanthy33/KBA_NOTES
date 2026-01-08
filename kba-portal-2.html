@@ -270,7 +270,7 @@ function renderNote(note) {
         <p><strong>Environment:</strong> ${note.Environment || ''}</p>
         <p><strong>Action Definition:</strong> ${note["Action Definition"] || ''}</p>
         <h2>Description</h2><p>${note.Description || ''}</p>
-        <h2>Condition To Print</h2><p>${note.Condition To Print || ''}</p>
+        <h2>Condition To Print</h2><p>${note.["Condition To Print"] || ''}</p>
         <h2>When It Prints</h2><p>${note.Symptom || ''}</p>
         <h2>Steps To Print</h2>
         <ul>${(note["Steps To Print"] || []).map(step => `<li>${step}</li>`).join('')}</ul>
@@ -342,6 +342,7 @@ function renderNote(note) {
 </script>
 </body>
 </html>
+
 
 
 
