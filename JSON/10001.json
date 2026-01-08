@@ -10,7 +10,6 @@
     "Create a warehouse order",
     "When Warehouse task is created/ confirmed based on condition record maintenance label is printed"
   ],
-  "When It Prints": "Label is printed during Warehouse task creation/confirmation in both inbound/outbound process",
   "Size": "4X3 Label",
   "Action Definition": "Z_WT_CONF_LBL_4X3",
   "Additional Info": {
@@ -19,5 +18,6 @@
     "Printer": "1. Determination from conditon record 2. Can be maintained in user parameter with param id ZRF_PRINTER"
   }
 }
+
 
 
