@@ -1,1 +1,23 @@
 
+{
+  "Title": "GR Label",
+  "KBA": "10003",
+  "Date": "2026-01-09 10:07:48",
+  "Description": "Inbound Recieivng - GR Label",
+  "Environment": "EWM 2020; IM",
+  "Condition To Print": "Maintain the condition record in tcode MN21/MN22",
+  "Steps To Print": [
+    "Once IBD is available in SAP, upon Goods Recipt, GR label would get printed",
+    "This can be printed for both IM and EWM sites"
+  ],
+ "Size": "100 X 105 mm",
+ "Action Definition": "ZEE1",
+  "Additional Info": {
+    "Trigger": "Triggered from material document output type",
+    "DO": "7946",
+    "WRICEF": "RO-MM-WH-1236"
+  },
+  "Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/GR_Label.jpg"
+  ]
+}
