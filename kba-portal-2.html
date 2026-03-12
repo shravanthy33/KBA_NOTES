@@ -160,6 +160,20 @@ footer {
   <div id="noteView" class="hidden" style="width: 100%;">
     <div id="noteContent"></div>
   </div>
+
+    <!-- FILTER View -->
+  <div class="filter-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
+  <select id="moduleSelect" style="padding: 8px; border-radius: 5px; flex: 1;">
+    <option value="">All Modules (IM, EWM, WM)</option>
+    <option value="IM">IM</option>
+    <option value="EWM">EWM</option>
+    <option value="WM">WM</option>
+  </select>
+
+  <select id="landscapeSelect" style="padding: 8px; border-radius: 5px; flex: 1;" disabled>
+    <option value="">Select Landscape (HU, WO, Delivery)</option>
+  </select>
+</div>
 </main>
 
 <footer>
@@ -243,6 +257,60 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  let notesList = []; // This will now hold the full objects from index.json
+
+async function loadIndex() {
+  try {
+    const res = await fetch(INDEX_URL);
+    notesList = await res.json(); // Now contains id, title, module, landscape
+    renderList(notesList);
+  } catch (e) {
+    document.getElementById("results").innerHTML = "<p>Error loading index.json</p>";
+  }
+}
+
+// Logic to handle Cascading Filters
+const moduleSelect = document.getElementById("moduleSelect");
+const landscapeSelect = document.getElementById("landscapeSelect");
+
+moduleSelect.addEventListener("change", () => {
+  const selectedModule = moduleSelect.value;
+  
+  if (selectedModule) {
+    landscapeSelect.disabled = false;
+    // Optional: Only show landscapes that actually exist for this module
+    const availableLandscapes = [...new Set(notesList
+      .filter(n => n.module === selectedModule)
+      .map(n => n.landscape))];
+    
+    landscapeSelect.innerHTML = '<option value="">All Landscapes</option>' + 
+      availableLandscapes.map(l => `<option value="${l}">${l}</option>`).join("");
+  } else {
+    landscapeSelect.disabled = true;
+    landscapeSelect.value = "";
+  }
+  applyFilters();
+});
+
+landscapeSelect.addEventListener("change", applyFilters);
+document.getElementById("searchInput").addEventListener("input", applyFilters);
+
+function applyFilters() {
+  const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+  const selectedModule = moduleSelect.value;
+  const selectedLandscape = landscapeSelect.value;
+
+  const filtered = notesList.filter(note => {
+    const matchesSearch = note.title.toLowerCase().includes(searchQuery) || note.id.includes(searchQuery);
+    const matchesModule = selectedModule === "" || note.module === selectedModule;
+    const matchesLandscape = selectedLandscape === "" || note.landscape === selectedLandscape;
+    
+    return matchesSearch && matchesModule && matchesLandscape;
+  });
+
+  renderList(filtered);
+}
+
   function addToSearchHistory(id, title) {
     const existing = searchHistory.find(item => item.id === id);
     if (existing) {
@@ -254,6 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTiles();
   }
 
+  
 function renderNote(note) {
   const hasImage = note.Images && note.Images.length > 0;
   document.getElementById('listView').classList.add('hidden');
@@ -341,6 +410,7 @@ function renderNote(note) {
 </script>
 </body>
 </html>
+
 
 
 
