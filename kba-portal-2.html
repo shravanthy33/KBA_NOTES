@@ -162,17 +162,21 @@ footer {
   </div>
 
     <!-- FILTER View -->
-  <div class="filter-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
-  <select id="moduleSelect" style="padding: 8px; border-radius: 5px; flex: 1;">
-    <option value="">All Modules (IM, EWM, WM)</option>
-    <option value="IM">IM</option>
-    <option value="EWM">EWM</option>
-    <option value="WM">WM</option>
-  </select>
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Search KBAs...">
+  
+  <div class="filter-group">
+    <select id="moduleSelect">
+      <option value="">Module: All</option>
+      <option value="IM">IM</option>
+      <option value="EWM">EWM</option>
+      <option value="WM">WM</option>
+    </select>
 
-  <select id="landscapeSelect" style="padding: 8px; border-radius: 5px; flex: 1;" disabled>
-    <option value="">Select Landscape (HU, WO, Delivery)</option>
-  </select>
+    <select id="landscapeSelect" disabled>
+      <option value="">Landscape: All</option>
+    </select>
+  </div>
 </div>
 </main>
 
@@ -410,6 +414,7 @@ function renderNote(note) {
 </script>
 </body>
 </html>
+
 
 
 
