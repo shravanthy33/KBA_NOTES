@@ -2,17 +2,24 @@
   {
     "id": "10001",
     "title": "Picking Label 4X3"
+    "module": "WO",
+    "landscape": "EWM"
   },
   {
     "id": "10002",
     "title": "KLT Label for BMW"
+    "module": "HU",
+    "landscape": "EWM"
   },
     {
     "id": "10003",
     "title": "GR Label"
+    "module": " ",
+    "landscape": "IM"
   }
 
 ]
+
 
 
 
