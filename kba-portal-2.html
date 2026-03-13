@@ -338,11 +338,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <button id="zoomIn">+</button>
             <button id="zoomOut">-</button>
             <button id="resetZoom">Reset</button>
-            <a id="downloadImg" href="${BASE_URL}${note.Images[0]}" download>
+            <a id="downloadImg" href="${note.Images[0]}" download>
               <button>Download</button>
             </a>
           </div>
-          <img id="zoomImg" src="${BASE_URL}${note.Images[0]}" alt="KBA Image">
+          <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image" style="margin-top:5cm;">
         </div>` : ''}
       </div>
     `;
@@ -374,6 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
