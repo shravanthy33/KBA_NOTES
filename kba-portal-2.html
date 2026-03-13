@@ -189,22 +189,19 @@ footer {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // This relative path is the key. It looks for the folder structure in the same directory as the HTML file.
-  const BASE_URL = './';
+  // This path now correctly points to your JSON subdirectory.
+  const BASE_URL = 'KBA_NOTES/JSON/';
   const INDEX_URL = `${BASE_URL}index.json`;
 
-  // The single, correct declaration for notesList. The duplicate was removed.
   let notesList = [];
   let searchHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]");
 
-  // This is your original function for loading data, with the pathing fixed.
   async function loadIndex() {
     try {
       const res = await fetch(INDEX_URL);
-      if (!res.ok) throw new Error(`Could not find index.json. Please ensure it is in the same folder as your HTML file.`);
+      if (!res.ok) throw new Error(`Could not find index.json. Please check your folder structure.`);
       
       const data = await res.json();
-      // We now have all the data (id, title, module) and don't need the second loop.
       notesList = data; 
       
       renderList(notesList);
@@ -282,16 +279,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   async function loadNote(noteId) {
-    // This path assumes your individual JSON files are in the same directory.
+    // This now correctly looks for the note file inside the subdirectory.
     const fileUrl = `${BASE_URL}${noteId}.json`;
     try {
       const response = await fetch(fileUrl);
-      if (!response.ok) throw new Error();
+      // Added a more descriptive error message here
+      if (!response.ok) throw new Error(`File not found at '${fileUrl}'`);
       const note = await response.json();
       addToSearchHistory(noteId, note.Title);
       renderNote(note);
-    } catch {
-      document.getElementById('noteContent').innerHTML = `<p>Note not found: ${noteId}</p>`;
+    } catch(err) {
+      // The error message will now be more helpful
+      document.getElementById('noteContent').innerHTML = `<p style="color: red; font-weight: bold;">Error: ${err.message}</p>`;
+      document.getElementById('listView').classList.add('hidden');
+      document.querySelector('.right-pane').classList.add('hidden');
       document.getElementById('noteView').classList.remove('hidden');
     }
   }
@@ -337,11 +338,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <button id="zoomIn">+</button>
             <button id="zoomOut">-</button>
             <button id="resetZoom">Reset</button>
-            <a id="downloadImg" href="${note.Images[0]}" download>
+            <a id="downloadImg" href="${BASE_URL}${note.Images[0]}" download>
               <button>Download</button>
             </a>
           </div>
-          <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image">
+          <img id="zoomImg" src="${BASE_URL}${note.Images[0]}" alt="KBA Image">
         </div>` : ''}
       </div>
     `;
