@@ -166,8 +166,9 @@ footer {
           <option value="EWM">EWM</option>
           <option value="WM">WM</option>
         </select>
-        <select id="LandscapeSelect" disabled>
-          <option value="">Landscape: All</option>
+        <!-- MODIFIED: Renamed ID and text for Classification -->
+        <select id="ClassificationSelect" disabled>
+          <option value="">Classification: All</option>
         </select>
     </div>
     <div id="results" class="note-list">Loading KBAs...</div>
@@ -189,9 +190,8 @@ footer {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // This path now correctly points to your JSON subdirectory.
-    const BASE_URL = './';
- const INDEX_URL = `${window.location.origin}/KBA_NOTES/JSON/index.json`;
+  const NOTES_BASE_URL = `${window.location.origin}/KBA_NOTES/JSON/`;
+  const INDEX_URL = `${NOTES_BASE_URL}index.json`;
 
   let notesList = [];
   let searchHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]");
@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadIndex() {
     try {
       const res = await fetch(INDEX_URL);
-      if (!res.ok) throw new Error(`Could not find index.json. Please check your folder structure.`);
+      if (!res.ok) throw new Error(`Could not find index.json. Please check your folder structure and that you are running a local server.`);
       
       const data = await res.json();
       notesList = data; 
@@ -228,42 +228,55 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyFilters() {
     const searchQuery = document.getElementById("searchInput").value.toLowerCase();
     const selectedModule = document.getElementById("ModuleSelect").value;
-    const selectedLandscape = document.getElementById("LandscapeSelect").value;
+    // MODIFIED: Renamed to selectedClassification
+    const selectedClassification = document.getElementById("ClassificationSelect").value;
 
     const filtered = notesList.filter(note => {
       const title = note.title || '';
       const id = note.id || '';
       const matchesSearch = title.toLowerCase().includes(searchQuery) || id.includes(searchQuery);
       const matchesModule = selectedModule === "" || note.module === selectedModule;
-      const matchesLandscape = selectedLandscape === "" || note.landscape === selectedLandscape;
+      // MODIFIED: Renamed to matchesClassification and filtering on note.classification
+      const matchesClassification = selectedClassification === "" || note.classification === selectedClassification;
       
-      return matchesSearch && matchesModule && matchesLandscape;
+      return matchesSearch && matchesModule && matchesClassification;
     });
 
     renderList(filtered);
   }
 
   document.getElementById("searchInput").addEventListener("input", applyFilters);
+  
+  // MODIFIED: Logic for handling the module and classification filter dependency
   document.getElementById("ModuleSelect").addEventListener("change", () => {
     const moduleSelect = document.getElementById("ModuleSelect");
-    const landscapeSelect = document.getElementById("LandscapeSelect");
+    const classificationSelect = document.getElementById("ClassificationSelect");
     const selectedModule = moduleSelect.value;
     
-    if (selectedModule) {
-      landscapeSelect.disabled = false;
-      const availableLandscapes = [...new Set(notesList
-        .filter(n => n.module === selectedModule)
-        .map(n => n.landscape))];
-      
-      landscapeSelect.innerHTML = '<option value="">All Landscapes</option>' + 
-        availableLandscapes.map(l => `<option value="${l}">${l}</option>`).join("");
+    // Always reset the classification filter on change
+    classificationSelect.value = "";
+
+    if (selectedModule === 'EWM') {
+      // If EWM is selected, enable the classification filter and populate it
+      classificationSelect.disabled = false;
+      classificationSelect.innerHTML = `
+        <option value="">Classification: All</option>
+        <option value="WO">WO</option>
+        <option value="HU">HU</option>
+        <option value="DLV">DLV</option>
+      `;
     } else {
-      landscapeSelect.disabled = true;
-      landscapeSelect.value = "";
+      // For any other module, disable the classification filter and reset its options
+      classificationSelect.disabled = true;
+      classificationSelect.innerHTML = '<option value="">Classification: All</option>';
     }
+    
+    // Re-apply filters to update the displayed list
     applyFilters();
   });
-  document.getElementById("LandscapeSelect").addEventListener("change", applyFilters);
+
+  // MODIFIED: Renamed event listener from LandscapeSelect to ClassificationSelect
+  document.getElementById("ClassificationSelect").addEventListener("change", applyFilters);
   
   document.getElementById("results").addEventListener("click", e => {
     if (e.target.tagName === "A") {
@@ -279,17 +292,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   async function loadNote(noteId) {
-    // This now correctly looks for the note file inside the subdirectory.
-    const fileUrl = `${window.location.origin}/KBA_NOTES/JSON/${noteId}.json`;
+    const fileUrl = `${NOTES_BASE_URL}${noteId}.json`;
     try {
       const response = await fetch(fileUrl);
-      // Added a more descriptive error message here
       if (!response.ok) throw new Error(`File not found at '${fileUrl}'`);
       const note = await response.json();
       addToSearchHistory(noteId, note.Title);
       renderNote(note);
     } catch(err) {
-      // The error message will now be more helpful
       document.getElementById('noteContent').innerHTML = `<p style="color: red; font-weight: bold;">Error: ${err.message}</p>`;
       document.getElementById('listView').classList.add('hidden');
       document.querySelector('.right-pane').classList.add('hidden');
@@ -338,11 +348,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <button id="zoomIn">+</button>
             <button id="zoomOut">-</button>
             <button id="resetZoom">Reset</button>
-            <a id="downloadImg" href="${note.Images[0]}" download>
+            <a id="downloadImg" href="${NOTES_BASE_URL}${note.Images[0]}" download>
               <button>Download</button>
             </a>
           </div>
-          <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image" style="margin-top:5cm;">
+          <img id="zoomImg" src="${NOTES_BASE_URL}${note.Images[0]}" alt="KBA Image" style="margin-top:5cm;">
         </div>` : ''}
       </div>
     `;
@@ -374,8 +384,3 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
-
-
-
-
-
