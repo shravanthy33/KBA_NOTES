@@ -98,7 +98,7 @@ main { flex: 1; padding: 1em; display: flex; flex-wrap: wrap; gap: 1em; }
   position: relative;
 }
 .note-right img {
-  margin-top: 5cm; /* move image down */
+  margin-top: 5cm;
   max-width: none;
   max-height: none;
   cursor: grab;
@@ -155,14 +155,13 @@ footer {
 </header>
 
 <main>
-  <!-- List View Container -->
   <div class="left-pane" id="listView">
     <div class="search-bar">
       <input type="text" id="searchInput" placeholder="Search KBAs...">
     </div>
-     <div class="filter-group">
+    <div class="filter-group">
         <select id="ModuleSelect">
-          <option value="">Module: All</option>
+          <option value="">All</option>
           <option value="IM">IM</option>
           <option value="EWM">EWM</option>
           <option value="WM">WM</option>
@@ -170,18 +169,16 @@ footer {
         <select id="LandscapeSelect" disabled>
           <option value="">Landscape: All</option>
         </select>
-      </div>
+    </div>
     <div id="results" class="note-list">Loading KBAs...</div>
   </div>
 
-  <!-- Right pane: Frequently searched -->
-  <div class="right-pane" id="rightPane">
+  <div class="right-pane">
     <h3>Frequently Searched Notes</h3>
     <div id="tiles" class="tiles"></div>
   </div>
 
-  <!-- Note View (initially hidden) -->
-  <div id="noteView" class="hidden note-container">
+  <div id="noteView" class="hidden" style="width: 100%;">
     <div id="noteContent"></div>
   </div>
 </main>
@@ -192,77 +189,131 @@ footer {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // This relative path is the key. It will work when you run a local server.
-  // It tells the browser to look for the 'KBA_NOTES' folder in the same directory as the HTML file.
-  const BASE_PATH = 'KBA_NOTES/JSON/';
-  const INDEX_URL = `${BASE_PATH}index.json`;
-  
+  // This relative path is the key. It looks for the folder structure in the same directory as the HTML file.
+  const BASE_URL = './';
+  const INDEX_URL = `${BASE_URL}index.json`;
+
+  // The single, correct declaration for notesList. The duplicate was removed.
   let notesList = [];
   let searchHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]");
 
-  // Element references
-  const resultsContainer = document.getElementById("results");
-  const searchInput = document.getElementById("searchInput");
-  const tilesContainer = document.getElementById("tiles");
-  const moduleSelect = document.getElementById("ModuleSelect");
-  const landscapeSelect = document.getElementById("LandscapeSelect");
-  const listView = document.getElementById('listView');
-  const rightPane = document.getElementById('rightPane');
-  const noteView = document.getElementById('noteView');
-  const noteContent = document.getElementById('noteContent');
-
-  // --- DATA LOADING ---
+  // This is your original function for loading data, with the pathing fixed.
   async function loadIndex() {
     try {
       const res = await fetch(INDEX_URL);
-      if (!res.ok) throw new Error(`Failed to fetch index with status: ${res.status}. Check if the file path is correct.`);
-      notesList = await res.json();
+      if (!res.ok) throw new Error(`Could not find index.json. Please ensure it is in the same folder as your HTML file.`);
+      
+      const data = await res.json();
+      // We now have all the data (id, title, module) and don't need the second loop.
+      notesList = data; 
+      
       renderList(notesList);
       renderTiles();
-    } catch (e) {
-      resultsContainer.innerHTML = `<p><b>Error:</b> ${e.message}<br>Please ensure you are running this from a local web server and your folder structure is correct.</p>`;
-      console.error(e);
+    } catch(e) {
+      document.getElementById("results").innerHTML = `<p style="color: red; font-weight: bold;">${e.message}</p>`;
     }
   }
 
-  async function loadNote(noteId) {
-    const noteInfo = notesList.find(n => n.id === noteId);
-    const noteTitle = noteInfo ? noteInfo.title : "Untitled KBA";
-    
-    const fileUrl = `${BASE_PATH}${noteId}.json`;
-    try {
-      const response = await fetch(fileUrl);
-      if (!response.ok) throw new Error(`Note file not found at ${fileUrl}`);
-      const note = await response.json();
-      
-      addToSearchHistory(noteId, note.Title || noteTitle); 
-      renderNote(note);
-    } catch(err) {
-      noteContent.innerHTML = `<p>Error loading note: ${err.message}</p>`;
-      showNoteView();
-      console.error(err);
-    }
-  }
-
-  // --- RENDERING & UI ---
   function renderList(list) {
-    resultsContainer.innerHTML = list.map(note =>
+    document.getElementById("results").innerHTML = list.map(note =>
       `<a href="#" data-id="${note.id}">${note.title}</a>`
-    ).join("") || "<p>No matching KBAs found.</p>";
+    ).join("");
   }
 
   function renderTiles() {
-    const sorted = [...searchHistory].sort((a, b) => b.count - a.count).slice(0, 5);
+    const tilesContainer = document.getElementById("tiles");
+    const sorted = [...searchHistory].sort((a,b) => b.count - a.count).slice(0,5);
     tilesContainer.innerHTML = sorted.map(item =>
       `<div class="tile" data-id="${item.id}">${item.title}</div>`
     ).join("");
   }
 
+  function applyFilters() {
+    const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+    const selectedModule = document.getElementById("ModuleSelect").value;
+    const selectedLandscape = document.getElementById("LandscapeSelect").value;
+
+    const filtered = notesList.filter(note => {
+      const title = note.title || '';
+      const id = note.id || '';
+      const matchesSearch = title.toLowerCase().includes(searchQuery) || id.includes(searchQuery);
+      const matchesModule = selectedModule === "" || note.module === selectedModule;
+      const matchesLandscape = selectedLandscape === "" || note.landscape === selectedLandscape;
+      
+      return matchesSearch && matchesModule && matchesLandscape;
+    });
+
+    renderList(filtered);
+  }
+
+  document.getElementById("searchInput").addEventListener("input", applyFilters);
+  document.getElementById("ModuleSelect").addEventListener("change", () => {
+    const moduleSelect = document.getElementById("ModuleSelect");
+    const landscapeSelect = document.getElementById("LandscapeSelect");
+    const selectedModule = moduleSelect.value;
+    
+    if (selectedModule) {
+      landscapeSelect.disabled = false;
+      const availableLandscapes = [...new Set(notesList
+        .filter(n => n.module === selectedModule)
+        .map(n => n.landscape))];
+      
+      landscapeSelect.innerHTML = '<option value="">All Landscapes</option>' + 
+        availableLandscapes.map(l => `<option value="${l}">${l}</option>`).join("");
+    } else {
+      landscapeSelect.disabled = true;
+      landscapeSelect.value = "";
+    }
+    applyFilters();
+  });
+  document.getElementById("LandscapeSelect").addEventListener("change", applyFilters);
+  
+  document.getElementById("results").addEventListener("click", e => {
+    if (e.target.tagName === "A") {
+      e.preventDefault();
+      loadNote(e.target.getAttribute("data-id"));
+    }
+  });
+
+  document.getElementById("tiles").addEventListener("click", e => {
+    if (e.target.classList.contains("tile")) {
+      loadNote(e.target.getAttribute("data-id"));
+    }
+  });
+
+  async function loadNote(noteId) {
+    // This path assumes your individual JSON files are in the same directory.
+    const fileUrl = `${BASE_URL}${noteId}.json`;
+    try {
+      const response = await fetch(fileUrl);
+      if (!response.ok) throw new Error();
+      const note = await response.json();
+      addToSearchHistory(noteId, note.Title);
+      renderNote(note);
+    } catch {
+      document.getElementById('noteContent').innerHTML = `<p>Note not found: ${noteId}</p>`;
+      document.getElementById('noteView').classList.remove('hidden');
+    }
+  }
+
+  function addToSearchHistory(id, title) {
+    const existing = searchHistory.find(item => item.id === id);
+    if (existing) {
+      existing.count++;
+    } else {
+      searchHistory.push({ id, title, count: 1 });
+    }
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+    renderTiles();
+  }
+
   function renderNote(note) {
     const hasImage = note.Images && note.Images.length > 0;
-    showNoteView();
+    document.getElementById('listView').classList.add('hidden');
+    document.querySelector('.right-pane').classList.add('hidden');
+    document.getElementById('noteView').classList.remove('hidden');
 
-    noteContent.innerHTML = `
+    document.getElementById('noteContent').innerHTML = `
       <div class="note-container">
         <div class="note-left ${!hasImage ? 'full-width' : ''}">
           <button id="backBtn">← Back to Search</button>
@@ -286,104 +337,37 @@ document.addEventListener("DOMContentLoaded", () => {
             <button id="zoomIn">+</button>
             <button id="zoomOut">-</button>
             <button id="resetZoom">Reset</button>
-            <a id="downloadImg" href="${BASE_PATH}${note.Images[0]}" download>
+            <a id="downloadImg" href="${note.Images[0]}" download>
               <button>Download</button>
             </a>
           </div>
-          <img id="zoomImg" src="${BASE_PATH}${note.Images[0]}" alt="KBA Image">
+          <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image">
         </div>` : ''}
       </div>
     `;
 
-    document.getElementById("backBtn").addEventListener("click", showListView);
-    if (hasImage) setupImageZoom();
-  }
-
-  function showListView() {
-      noteView.classList.add('hidden');
-      listView.classList.remove('hidden');
-      rightPane.classList.remove('hidden');
-      noteContent.innerHTML = '';
-  }
-
-  function showNoteView() {
-      listView.classList.add('hidden');
-      rightPane.classList.add('hidden');
-      noteView.classList.remove('hidden');
-  }
-
-  // --- FILTERS & EVENT LISTENERS ---
-  function applyFilters() {
-    const searchQuery = searchInput.value.toLowerCase();
-    const selectedModule = moduleSelect.value;
-    const selectedLandscape = landscapeSelect.value;
-
-    const filtered = notesList.filter(note => {
-      const matchesSearch = note.title.toLowerCase().includes(searchQuery) || note.id.includes(searchQuery);
-      const matchesModule = !selectedModule || note.module === selectedModule;
-      const matchesLandscape = !selectedLandscape || note.landscape === selectedLandscape;
-      return matchesSearch && matchesModule && matchesLandscape;
+    document.getElementById("backBtn").addEventListener("click", () => {
+      document.getElementById('noteView').classList.add('hidden');
+      document.getElementById('listView').classList.remove('hidden');
+      document.querySelector('.right-pane').classList.remove('hidden');
     });
-    renderList(filtered);
-  }
 
-  moduleSelect.addEventListener("change", () => {
-    const selectedModule = moduleSelect.value;
-    landscapeSelect.value = ""; 
+    if (hasImage) {
+      let scale = 1;
+      let isDragging = false;
+      const zoomImg = document.getElementById("zoomImg");
+      const imageContainer = document.getElementById("imageContainer");
 
-    if (selectedModule) {
-      landscapeSelect.disabled = false;
-      const availableLandscapes = [...new Set(notesList
-        .filter(n => n.module === selectedModule && n.landscape)
-        .map(n => n.landscape))];
-      
-      landscapeSelect.innerHTML = '<option value="">Landscape: All</option>' +
-        availableLandscapes.map(l => `<option value="${l}">${l}</option>`).join("");
-    } else {
-      landscapeSelect.disabled = true;
-      landscapeSelect.innerHTML = '<option value="">Landscape: All</option>';
+      document.getElementById("zoomIn").addEventListener("click", () => { scale += 0.2; zoomImg.style.transform = `scale(${scale})`; });
+      document.getElementById("zoomOut").addEventListener("click", () => { scale = Math.max(1, scale - 0.2); zoomImg.style.transform = `scale(${scale})`; });
+      document.getElementById("resetZoom").addEventListener("click", () => { scale = 1; zoomImg.style.transform = `scale(${scale}) translate(0,0)`; imageContainer.scrollTop = 0; imageContainer.scrollLeft = 0; });
+      zoomImg.addEventListener("mousedown", () => { isDragging = true; zoomImg.style.cursor = "grabbing"; });
+      zoomImg.addEventListener("mouseup", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
+      zoomImg.addEventListener("mouseleave", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
+      zoomImg.addEventListener("mousemove", e => { if (!isDragging) return; e.preventDefault(); imageContainer.scrollLeft -= e.movementX; imageContainer.scrollTop -= e.movementY; });
     }
-    applyFilters();
-  });
-
-  landscapeSelect.addEventListener("change", applyFilters);
-  searchInput.addEventListener("input", applyFilters);
-
-  resultsContainer.addEventListener("click", e => {
-    if (e.target.tagName === "A") {
-      e.preventDefault();
-      loadNote(e.target.getAttribute("data-id"));
-    }
-  });
-
-  tilesContainer.addEventListener("click", e => {
-    const tile = e.target.closest(".tile");
-    if (tile) loadNote(tile.getAttribute("data-id"));
-  });
-
-  function addToSearchHistory(id, title) {
-    const existing = searchHistory.find(item => item.id === id);
-    if (existing) existing.count++;
-    else searchHistory.push({ id, title, count: 1 });
-    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
-    renderTiles();
-  }
-  
-  function setupImageZoom() {
-    let scale = 1;
-    let isDragging = false;
-    const zoomImg = document.getElementById("zoomImg");
-    const imageContainer = document.getElementById("imageContainer");
-
-    document.getElementById("zoomIn").addEventListener("click", () => { scale = Math.min(3, scale + 0.2); zoomImg.style.transform = `scale(${scale})`; });
-    document.getElementById("zoomOut").addEventListener("click", () => { scale = Math.max(0.5, scale - 0.2); zoomImg.style.transform = `scale(${scale})`; });
-    document.getElementById("resetZoom").addEventListener("click", () => { scale = 1; zoomImg.style.transform = `scale(1) translate(0,0)`; imageContainer.scrollTop = 0; imageContainer.scrollLeft = 0; });
-    zoomImg.addEventListener("mousedown", () => { isDragging = true; zoomImg.style.cursor = "grabbing"; });
-    window.addEventListener("mouseup", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
-    window.addEventListener("mousemove", e => { if (!isDragging) return; e.preventDefault(); imageContainer.scrollLeft -= e.movementX / scale; imageContainer.scrollTop -= e.movementY / scale; });
   }
 
-  // --- INITIAL LOAD ---
   loadIndex();
 });
 </script>
