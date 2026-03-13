@@ -232,13 +232,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const filtered = notesList.filter(note => {
       const title = note.title || '';
       const id = note.id || '';
-      const classification = note.classification || ''; // Ensure classification exists
+      const classification = note.classification || '';
 
       const matchesSearch = title.toLowerCase().includes(searchQuery) || id.includes(searchQuery);
       const matchesModule = selectedModule === "" || note.module === selectedModule;
-      
-      // *** THIS IS THE FIX ***
-      // We now .trim() the data to remove hidden whitespace before comparing.
       const matchesClassification = selectedClassification === "" || classification.trim() === selectedClassification;
       
       return matchesSearch && matchesModule && matchesClassification;
@@ -344,11 +341,13 @@ document.addEventListener("DOMContentLoaded", () => {
             <button id="zoomIn">+</button>
             <button id="zoomOut">-</button>
             <button id="resetZoom">Reset</button>
-            <a id="downloadImg" href="${NOTES_BASE_URL}${note.Images[0]}" download>
+            <!-- CORRECTED: Removed NOTES_BASE_URL prefix from download link -->
+            <a id="downloadImg" href="${note.Images[0]}" download>
               <button>Download</button>
             </a>
           </div>
-          <img id="zoomImg" src="${NOTES_BASE_URL}${note.Images[0]}" alt="KBA Image" style="margin-top:5cm;">
+          <!-- CORRECTED: Removed NOTES_BASE_URL prefix from image source -->
+          <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image" style="margin-top:5cm;">
         </div>` : ''}
       </div>
     `;
