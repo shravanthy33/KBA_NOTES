@@ -166,7 +166,6 @@ footer {
           <option value="EWM">EWM</option>
           <option value="WM">WM</option>
         </select>
-        <!-- MODIFIED: Renamed ID and text for Classification -->
         <select id="ClassificationSelect" disabled>
           <option value="">Classification: All</option>
         </select>
@@ -198,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadIndex() {
     try {
-      const res = await fetch(INDEX_URL);
+      const res = await fetch(`${INDEX_URL}?v=${new Date().getTime()}`);
       if (!res.ok) throw new Error(`Could not find index.json. Please check your folder structure and that you are running a local server.`);
       
       const data = await res.json();
@@ -207,14 +206,14 @@ document.addEventListener("DOMContentLoaded", () => {
       renderList(notesList);
       renderTiles();
     } catch(e) {
-      document.getElementById("results").innerHTML = `<p style="color: red; font-weight: bold;">${e.message}</p>`;
+      document.getElementById("results").innerHTML = `<p style="color: red; font-weight: bold;">Error loading data: ${e.message}. Please check your index.json file for syntax errors (like missing commas).</p>`;
     }
   }
 
   function renderList(list) {
     document.getElementById("results").innerHTML = list.map(note =>
       `<a href="#" data-id="${note.id}">${note.title}</a>`
-    ).join("");
+    ).join("") || "<p>No matching KBAs found.</p>";
   }
 
   function renderTiles() {
@@ -228,16 +227,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyFilters() {
     const searchQuery = document.getElementById("searchInput").value.toLowerCase();
     const selectedModule = document.getElementById("ModuleSelect").value;
-    // MODIFIED: Renamed to selectedClassification
     const selectedClassification = document.getElementById("ClassificationSelect").value;
 
     const filtered = notesList.filter(note => {
       const title = note.title || '';
       const id = note.id || '';
+      const classification = note.classification || ''; // Ensure classification exists
+
       const matchesSearch = title.toLowerCase().includes(searchQuery) || id.includes(searchQuery);
       const matchesModule = selectedModule === "" || note.module === selectedModule;
-      // MODIFIED: Renamed to matchesClassification and filtering on note.classification
-      const matchesClassification = selectedClassification === "" || note.classification === selectedClassification;
+      
+      // *** THIS IS THE FIX ***
+      // We now .trim() the data to remove hidden whitespace before comparing.
+      const matchesClassification = selectedClassification === "" || classification.trim() === selectedClassification;
       
       return matchesSearch && matchesModule && matchesClassification;
     });
@@ -247,17 +249,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("searchInput").addEventListener("input", applyFilters);
   
-  // MODIFIED: Logic for handling the module and classification filter dependency
   document.getElementById("ModuleSelect").addEventListener("change", () => {
     const moduleSelect = document.getElementById("ModuleSelect");
     const classificationSelect = document.getElementById("ClassificationSelect");
     const selectedModule = moduleSelect.value;
     
-    // Always reset the classification filter on change
     classificationSelect.value = "";
 
     if (selectedModule === 'EWM') {
-      // If EWM is selected, enable the classification filter and populate it
       classificationSelect.disabled = false;
       classificationSelect.innerHTML = `
         <option value="">Classification: All</option>
@@ -266,16 +265,13 @@ document.addEventListener("DOMContentLoaded", () => {
         <option value="DLV">DLV</option>
       `;
     } else {
-      // For any other module, disable the classification filter and reset its options
       classificationSelect.disabled = true;
       classificationSelect.innerHTML = '<option value="">Classification: All</option>';
     }
     
-    // Re-apply filters to update the displayed list
     applyFilters();
   });
 
-  // MODIFIED: Renamed event listener from LandscapeSelect to ClassificationSelect
   document.getElementById("ClassificationSelect").addEventListener("change", applyFilters);
   
   document.getElementById("results").addEventListener("click", e => {
