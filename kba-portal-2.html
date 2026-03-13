@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadNote(noteId) {
     // This now correctly looks for the note file inside the subdirectory.
-    const fileUrl = `${BASE_URL}${noteId}.json`;
+    const fileUrl = `${window.location.origin}/KBA_NOTES/JSON/${entry.id}.json`;
     try {
       const response = await fetch(fileUrl);
       // Added a more descriptive error message here
@@ -374,5 +374,6 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
