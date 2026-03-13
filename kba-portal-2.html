@@ -191,7 +191,7 @@ footer {
 document.addEventListener("DOMContentLoaded", () => {
   // This path now correctly points to your JSON subdirectory.
     const BASE_URL = './';
-  const INDEX_URL = `${BASE_URL}index.json`;
+ const INDEX_URL = `${window.location.origin}/KBA_NOTES/JSON/index.json`;
 
   let notesList = [];
   let searchHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]");
@@ -374,4 +374,5 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
