@@ -192,8 +192,11 @@ footer {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // Use a real URL to your index.json for this to work
-  const INDEX_URL = 'index.json'; // Assuming index.json is in the same directory
+  // This relative path is the key. It will work when you run a local server.
+  // It tells the browser to look for the 'KBA_NOTES' folder in the same directory as the HTML file.
+  const BASE_PATH = 'KBA_NOTES/JSON/';
+  const INDEX_URL = `${BASE_PATH}index.json`;
+  
   let notesList = [];
   let searchHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]");
 
@@ -201,8 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultsContainer = document.getElementById("results");
   const searchInput = document.getElementById("searchInput");
   const tilesContainer = document.getElementById("tiles");
-  const moduleSelect = document.getElementById("ModuleSelect"); // Corrected ID
-  const landscapeSelect = document.getElementById("LandscapeSelect"); // Corrected ID
+  const moduleSelect = document.getElementById("ModuleSelect");
+  const landscapeSelect = document.getElementById("LandscapeSelect");
   const listView = document.getElementById('listView');
   const rightPane = document.getElementById('rightPane');
   const noteView = document.getElementById('noteView');
@@ -212,17 +215,36 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadIndex() {
     try {
       const res = await fetch(INDEX_URL);
-      if (!res.ok) throw new Error(`Failed to fetch index with status: ${res.status}`);
-      notesList = await res.json(); // notesList now contains id, title, module, landscape
+      if (!res.ok) throw new Error(`Failed to fetch index with status: ${res.status}. Check if the file path is correct.`);
+      notesList = await res.json();
       renderList(notesList);
       renderTiles();
     } catch (e) {
-      resultsContainer.innerHTML = `<p>Error loading KBAs. Make sure index.json is accessible.</p>`;
+      resultsContainer.innerHTML = `<p><b>Error:</b> ${e.message}<br>Please ensure you are running this from a local web server and your folder structure is correct.</p>`;
       console.error(e);
     }
   }
 
-  // --- RENDERING ---
+  async function loadNote(noteId) {
+    const noteInfo = notesList.find(n => n.id === noteId);
+    const noteTitle = noteInfo ? noteInfo.title : "Untitled KBA";
+    
+    const fileUrl = `${BASE_PATH}${noteId}.json`;
+    try {
+      const response = await fetch(fileUrl);
+      if (!response.ok) throw new Error(`Note file not found at ${fileUrl}`);
+      const note = await response.json();
+      
+      addToSearchHistory(noteId, note.Title || noteTitle); 
+      renderNote(note);
+    } catch(err) {
+      noteContent.innerHTML = `<p>Error loading note: ${err.message}</p>`;
+      showNoteView();
+      console.error(err);
+    }
+  }
+
+  // --- RENDERING & UI ---
   function renderList(list) {
     resultsContainer.innerHTML = list.map(note =>
       `<a href="#" data-id="${note.id}">${note.title}</a>`
@@ -264,28 +286,24 @@ document.addEventListener("DOMContentLoaded", () => {
             <button id="zoomIn">+</button>
             <button id="zoomOut">-</button>
             <button id="resetZoom">Reset</button>
-            <a id="downloadImg" href="${note.Images[0]}" download>
+            <a id="downloadImg" href="${BASE_PATH}${note.Images[0]}" download>
               <button>Download</button>
             </a>
           </div>
-          <img id="zoomImg" src="${note.Images[0]}" alt="KBA Image">
+          <img id="zoomImg" src="${BASE_PATH}${note.Images[0]}" alt="KBA Image">
         </div>` : ''}
       </div>
     `;
 
     document.getElementById("backBtn").addEventListener("click", showListView);
-
-    if (hasImage) {
-      setupImageZoom();
-    }
+    if (hasImage) setupImageZoom();
   }
 
-  // --- UI VISIBILITY ---
   function showListView() {
       noteView.classList.add('hidden');
       listView.classList.remove('hidden');
       rightPane.classList.remove('hidden');
-      noteContent.innerHTML = ''; // Clear content to prevent old data flashing
+      noteContent.innerHTML = '';
   }
 
   function showNoteView() {
@@ -294,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
       noteView.classList.remove('hidden');
   }
 
-  // --- FILTERS & SEARCH ---
+  // --- FILTERS & EVENT LISTENERS ---
   function applyFilters() {
     const searchQuery = searchInput.value.toLowerCase();
     const selectedModule = moduleSelect.value;
@@ -306,13 +324,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const matchesLandscape = !selectedLandscape || note.landscape === selectedLandscape;
       return matchesSearch && matchesModule && matchesLandscape;
     });
-
     renderList(filtered);
   }
 
   moduleSelect.addEventListener("change", () => {
     const selectedModule = moduleSelect.value;
-    landscapeSelect.value = ""; // Reset landscape filter
+    landscapeSelect.value = ""; 
 
     if (selectedModule) {
       landscapeSelect.disabled = false;
@@ -329,7 +346,6 @@ document.addEventListener("DOMContentLoaded", () => {
     applyFilters();
   });
 
-  // --- EVENT LISTENERS ---
   landscapeSelect.addEventListener("change", applyFilters);
   searchInput.addEventListener("input", applyFilters);
 
@@ -342,38 +358,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   tilesContainer.addEventListener("click", e => {
     const tile = e.target.closest(".tile");
-    if (tile) {
-      loadNote(tile.getAttribute("data-id"));
-    }
+    if (tile) loadNote(tile.getAttribute("data-id"));
   });
-
-  async function loadNote(noteId) {
-    const noteInfo = notesList.find(n => n.id === noteId);
-    const noteTitle = noteInfo ? noteInfo.title : "Untitled KBA";
-    
-    // For local testing, you might need a full path to the JSON files
-    const fileUrl = `${noteId}.json`; 
-    try {
-      const response = await fetch(fileUrl);
-      if (!response.ok) throw new Error(`Note file not found at ${fileUrl}`);
-      const note = await response.json();
-      
-      addToSearchHistory(noteId, note.Title || noteTitle); 
-      renderNote(note);
-    } catch(err) {
-      noteContent.innerHTML = `<p>Error loading note: ${err.message}</p>`;
-      showNoteView();
-      console.error(err);
-    }
-  }
 
   function addToSearchHistory(id, title) {
     const existing = searchHistory.find(item => item.id === id);
-    if (existing) {
-      existing.count++;
-    } else {
-      searchHistory.push({ id, title, count: 1 });
-    }
+    if (existing) existing.count++;
+    else searchHistory.push({ id, title, count: 1 });
     localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
     renderTiles();
   }
@@ -384,31 +375,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const zoomImg = document.getElementById("zoomImg");
     const imageContainer = document.getElementById("imageContainer");
 
-    document.getElementById("zoomIn").addEventListener("click", () => {
-      scale = Math.min(3, scale + 0.2); // Max zoom 3x
-      zoomImg.style.transform = `scale(${scale})`;
-    });
-
-    document.getElementById("zoomOut").addEventListener("click", () => {
-      scale = Math.max(0.5, scale - 0.2); // Min zoom 0.5x
-      zoomImg.style.transform = `scale(${scale})`;
-    });
-
-    document.getElementById("resetZoom").addEventListener("click", () => {
-      scale = 1;
-      zoomImg.style.transform = `scale(1) translate(0,0)`;
-      imageContainer.scrollTop = 0;
-      imageContainer.scrollLeft = 0;
-    });
-
+    document.getElementById("zoomIn").addEventListener("click", () => { scale = Math.min(3, scale + 0.2); zoomImg.style.transform = `scale(${scale})`; });
+    document.getElementById("zoomOut").addEventListener("click", () => { scale = Math.max(0.5, scale - 0.2); zoomImg.style.transform = `scale(${scale})`; });
+    document.getElementById("resetZoom").addEventListener("click", () => { scale = 1; zoomImg.style.transform = `scale(1) translate(0,0)`; imageContainer.scrollTop = 0; imageContainer.scrollLeft = 0; });
     zoomImg.addEventListener("mousedown", () => { isDragging = true; zoomImg.style.cursor = "grabbing"; });
     window.addEventListener("mouseup", () => { isDragging = false; zoomImg.style.cursor = "grab"; });
-    window.addEventListener("mousemove", e => {
-      if (!isDragging) return;
-      e.preventDefault();
-      imageContainer.scrollLeft -= e.movementX / scale;
-      imageContainer.scrollTop -= e.movementY / scale;
-    });
+    window.addEventListener("mousemove", e => { if (!isDragging) return; e.preventDefault(); imageContainer.scrollLeft -= e.movementX / scale; imageContainer.scrollTop -= e.movementY / scale; });
   }
 
   // --- INITIAL LOAD ---
