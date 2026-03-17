@@ -3,8 +3,7 @@
   "KBA": "10001",
   "Date": "2026-03-17T08:06:45.890Z",
   "Description": "Label for GR HU Label  with size 4X3 using action Z_GR_HU_LABEL",
-  "Condition To Print": "Upon Goods Receipt SSCC Label  (Z128). 
-  2. Printer name from condition record",
+  "Condition To Print": "Upon Goods Receipt SSCC Label  (Z128). 2. Printer name from condition record",
   "Environment": "EWM 2020; Embedded EWM",
   "Size": "4X3",
   "Action Definition": "Z_GR_HU_LABEL",
