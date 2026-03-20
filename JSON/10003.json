@@ -1,23 +1,21 @@
-
 {
-  "Title": "GR Label",
+  "Title": "KLT Label",
   "KBA": "10003",
-  "Date": "2026-01-09 10:07:48",
-  "Description": "Inbound Recieivng - GR Label",
-  "Environment": "EWM 2020; IM",
-  "Condition To Print": "Maintain the condition record in tcode MN21/MN22",
-  "Steps To Print": [
-    "Once IBD is available in SAP, upon Goods Recipt, GR label would get printed",
-    "This can be printed for both IM and EWM sites"
-  ],
- "Size": "100 X 105 mm",
- "Action Definition": "ZEE1",
+  "Date": "2026-03-17T08:06:45.894Z",
+  "Description": "Label for KLT Label with size 1/2 of A5 using action ZHU_BMW_KLT",
+  "Condition To Print": "Manually triggered form - will be printed manually from EWM pack workcenter",
+  "Environment": "EWM 2020; Embedded EWM",
+  "Size": "1/2 of A5",
+  "Action Definition": "ZHU_BMW_KLT",
   "Additional Info": {
-    "Trigger": "Triggered from material document output type",
-    "DO": "7946",
-    "WRICEF": "RO-MM-WH-1236"
-  },
-  "Images": [
-    "https://shravanthy33.github.io/KBA_NOTES/Images/GR_Label.jpg"
+    "DO": 4340,
+    "WRICEF": "WH-1818",
+    "Printer": "Printer to be maintained in condition record",
+    "Details": "Maintain table zt0430 with Ship to party to display last 9 digits of HU and display last 8 digits for delivery",
+    "Type of Form": "Adobe"
+  }
+"Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10003.jpg"
   ]
+
 }
