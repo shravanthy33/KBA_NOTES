@@ -11,7 +11,7 @@
     "DO": 3417,
     "WRICEF": "WH-1818",
     "Printer": "Printer details can be obtained from condition records. Else retrieve printer from user parameter with PARID = ZRF_PRINTER",
-    "Details": Condition record to be maintained w.r.t packaging material and ship to party.
+    "Details": "Condition record to be maintained w.r.t packaging material and ship to party.
                        Maintain table zt0430 with Ship to party to display last 9 digits of HU and to display last 8 digits for delivery",
     "Type of Form": "Adobe"
   }
