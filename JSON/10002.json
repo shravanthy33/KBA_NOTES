@@ -1,23 +1,22 @@
 {
-  "Title": "KLT Label for BMW",
+  "Title": "BMW Label",
   "KBA": "10002",
-  "Date": "2025-12-04 10:07:48",
-  "Description": "KLT label needs to be printed for BMW supplier",
-  "Symptom": "KLT label not getting triggered",
+  "Date": "2026-03-17 08:10:45",
+  "Description": "Label for BMW Label with size A5(210*148mm) using action ZHU_BMW_LABEL",
+  "Condition To Print": "The labels gets triggered upon HU weigh update",
   "Environment": "EWM 2020; Embedded EWM",
-  "Reproducing the Issue": [
-    "Pack the picked stock in a Handling Unit",
-    "After packing completed KLT label is expected"
-  ],
-  "Cause": "Missing or improper condition record",
-  "Resolution": "Create a condition record in tcode /scwm/prhu6",
-  "Action Definition": "ZHU_BMW_KLT",
+  "Size": "A5(210*148mm)",
+  "Action Definition": "ZHU_BMW_LABEL",
   "Additional Info": {
-    "Trigger": "KLT label is triggered on manual print from /scwm/pack transaction",
-    "DO": "4340",
-    "WRICEF": "RO-MM-WH-1818"
-  },
-  "Images": [
-    "https://shravanthy33.github.io/KBA_NOTES/Images/KLT_BMW.jpg"
+    "DO": 3417,
+    "WRICEF": "WH-1818",
+    "Printer": "Printer details can be obtained from condition records. Else retrieve printer from user parameter with PARID = ZRF_PRINTER",
+    "Details": Condition record to be maintained w.r.t packaging material and ship to party.
+                       Maintain table zt0430 with Ship to party to display last 9 digits of HU and to display last 8 digits for delivery",
+    "Type of Form": "Adobe"
+  }
+"Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10002.jpg"
   ]
+
 }
