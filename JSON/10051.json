@@ -12,5 +12,8 @@
     "WRICEF": "Printer determination from condition record",
     "Printer": "Triggered when WO status = 'C' or WT status = 'C'",
     "Type of Form": "Bartender"
-  }
+    },
+  "Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10051.jpg"
+  ]
 }
