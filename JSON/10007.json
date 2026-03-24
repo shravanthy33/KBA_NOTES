@@ -10,17 +10,12 @@
   "Additional Info": {
     "DO": 4080,
     "WRICEF": "WH-1818",
-    "Printer": "Printer to be obtained from condition recor
-    "Details" : Table ZT0430 is to be maintianed with Ship to party based on which following fields are customised.
-                Truncate HU to 9 character.
-                Date format with D suffix with DDMMYY format.
-                Unloading pt after colon(:) is printed.
-                Supplier code from ZED1 text is printed.
-                Delivery number is truncated to 8 characters (last 8)",
+    "Printer": "Printer to be obtained from condition record"
+    "Details" : "Table ZT0430 is to be maintianed with Ship to party based on which following fields are customised.\n2.Truncate HU to 9 character.\n3.Date format with D suffix with DDMMYY format.\n4.Unloading pt after colon(:) is printed.
+                Supplier code from ZED1 text is printed.\n5.Delivery number is truncated to 8 characters (last 8)",
     "Type of Form": "Adobe"
   }
 "Images": [
     "https://shravanthy33.github.io/KBA_NOTES/Images/10007.jpg"
   ]
-
 }
