@@ -1,0 +1,16 @@
+{
+  "Title": "WO label",
+  "KBA": "10003",
+  "Date": "2026-03-24T10:03:28.227Z",
+  "Description": "Label for WO label with size 3464 using action /SCWM/PRWO6",
+  "Condition To Print": "DS01\r\nDE09\r\nMX04\r\nMX07 Triggers when condition record matches\r\n\r\nCondition record is maintained for a specific logical transaction where WO label is needed",
+  "Environment": "EWM 2020; Embedded EWM",
+  "Size": 3464,
+  "Action Definition": "/SCWM/PRWO6",
+  "Additional Info": {
+    "DO": "WH-1833",
+    "WRICEF": "1. Get from condition record \r\n2. User param with id as ZRF_PRINTER\r\n\r\nPrints the WO number only",
+    "Printer": "Triggers when condition record matches\r\n\r\nCondition record is maintained for a specific logical transaction where WO label is needed",
+    "Type of Form": "Bartender"
+  }
+}

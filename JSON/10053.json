@@ -1,0 +1,16 @@
+{
+  "Title": "WO List",
+  "KBA": "10004",
+  "Date": "2026-03-24T10:03:28.251Z",
+  "Description": "Label for WO List with size 8882 using action /SCWM/PRWO6",
+  "Condition To Print": "AU02\r\nBG01\r\nBR03\r\nDE02\r\nDE03\r\nDE08\r\nDE09\r\nDSPE\r\nIT02\r\nMX - Warehouse\r\nSK01\r\nDS01 (almost all) Triggered based on condition record",
+  "Environment": "EWM 2020; Embedded EWM",
+  "Size": 8882,
+  "Action Definition": "/SCWM/PRWO6",
+  "Additional Info": {
+    "DO": "WH-1459",
+    "WRICEF": "Determined from condition record",
+    "Printer": "Triggered based on condition record",
+    "Type of Form": "Adobe"
+  }
+}

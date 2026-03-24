@@ -1,0 +1,16 @@
+{
+  "Title": "WT Label",
+  "KBA": "10005",
+  "Date": "2026-03-24T10:03:28.299Z",
+  "Description": "Label for WT Label with size 9820 using action /SCWM/PRWO6",
+  "Condition To Print": "BR03\r\nAU02\r\nDE09\r\nMX07\r\nNZ01 Triggered based on condition record only for open WO",
+  "Environment": "EWM 2020; Embedded EWM",
+  "Size": 9820,
+  "Action Definition": "/SCWM/PRWO6",
+  "Additional Info": {
+    "DO": "F-1660",
+    "WRICEF": "Printed as\r\n2010 -Picking Label, \r\n2100 - Production Label, \r\n1010 - Putaway Label, \r\nothers - WT Label\r\n\r\nDocument refenence, Text Z146 is printed\r\n\r\nFor barcode exclusion maintain the fields in DDC 5 -> 5.2 -> 5.2.100\r\n\r\nPrinter determined from condition records",
+    "Printer": "Triggered based on condition record only for open WO",
+    "Type of Form": "Bartender"
+  }
+}
