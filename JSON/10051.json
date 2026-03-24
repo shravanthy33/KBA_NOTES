@@ -1,16 +1,16 @@
 {
   "Title": "Kanban Label",
-  "KBA": "10002",
-  "Date": "2026-03-24T10:03:28.226Z",
-  "Description": "Label for Kanban Label with size 8962 using action /SCWM/PRWO6",
+  "KBA": "10051",
+  "Date": "2026-03-24 01:03:28",
+  "Description": "Label for Kanban Label",
   "Condition To Print": "Triggered when WO status = 'C' or WT status = 'C'",
   "Environment": "EWM 2020; Embedded EWM",
-  "Size": 8962,
+  "Size":  "To be confirmed"
   "Action Definition": "/SCWM/PRWO6",
   "Additional Info": {
-    "DO": "WH-1485",
-    "WRICEF": "Printer determination from condition record",
-    "Printer": "Triggered when WO status = 'C' or WT status = 'C'",
+    "DO": "8962",
+    "WRICEF": "WH-1485",
+    "Printer": "Printer determination from condition record",
     "Type of Form": "Bartender"
     },
   "Images": [
