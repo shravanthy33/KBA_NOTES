@@ -58,6 +58,18 @@
     "title": "VDA-55006",
     "module": "EWM",
     "classification": "HU"
+  },
+        {
+    "id": "10050",
+    "title": "RM Label",
+    "module": "EWM",
+    "classification": "WO"
+  },
+        {
+    "id": "10051",
+    "title": "Kanban Label",
+    "module": "EWM",
+    "classification": "WO"
   }
 ]
 
