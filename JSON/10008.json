@@ -10,7 +10,7 @@
   "Additional Info": {
     "DO": 3437,
     "WRICEF": "WH-1818",
-    "Printer": "Printer to be obtained from condition record".
+    "Printer": "Printer to be obtained from condition record",
     "Details": "When entry is maintained in Table ZT0430 with Ship to party, Delivery number is truncated to 8 characters (last 8)",
     "Type of Form": "Adobe"
   }
