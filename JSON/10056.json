@@ -1,7 +1,7 @@
 {
   "Title": "",
-  "KBA": "10007",
-  "Date": "2026-03-24T10:03:28.318Z",
+  "KBA": "10056",
+  "Date": "2026-03-24 3:28.33",
   "Description": "Label for  with size  using action ",
   "Condition To Print": "",
   "Environment": "EWM 2020; Embedded EWM",
@@ -13,4 +13,8 @@
     "Printer": "",
     "Type of Form": ""
   }
+    },
+  "Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10056.jpg"
+  ]
 }
