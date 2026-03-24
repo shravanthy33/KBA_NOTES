@@ -13,7 +13,7 @@
     "Printer": "Printer to be obtained from condition record",
     "Details": "When entry is maintained in Table ZT0430 with Ship to party, Delivery number is truncated to 8 characters (last 8)",
     "Type of Form": "Adobe"
-  }
+  },
 "Images": [
     "https://shravanthy33.github.io/KBA_NOTES/Images/10008.jpg"
   ]
