@@ -11,12 +11,10 @@
     "DO": 3442,
     "WRICEF": "WH-1818",
     "Printer": "Printer is determined from condition record",
-    "Details":"1. Condition record maintained w.r.t to work center, ship to party" \n
-                       "2. When entry is maintained in Table ZT0430 with Ship to party, Delivery number is truncated to 8 characters (last 8)",
+    "Details": "1. Condition record maintained with reference to work center and ship-to party.\n2. When entry is maintained in Table ZT0430 with Ship-to party, the Delivery number is truncated to the last 8 characters.",
     "Type of Form": "Adobe"
-  }
-"Images": [
+  },
+  "Images": [
     "https://shravanthy33.github.io/KBA_NOTES/Images/10010.jpg"
   ]
-
 }
