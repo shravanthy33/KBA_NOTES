@@ -16,8 +16,49 @@
     "title": "KLT Label",
     "module": "EWM",
     "classification": "HU"
+  },
+      {
+    "id": "10004",
+    "title": "Half Odette Label",
+    "module": "EWM",
+    "classification": "HU"
   }
-
+      {
+    "id": "10005",
+    "title": "Small Odette Label 4X6",
+    "module": "EWM",
+    "classification": "HU"
+  }
+        {
+    "id": "10006",
+    "title": "Small Odette Label",
+    "module": "EWM",
+    "classification": "HU"
+  }
+        {
+    "id": "10007",
+    "title": "VDA-55005",
+    "module": "EWM",
+    "classification": "HU"
+  }
+        {
+    "id": "10008",
+    "title": "VDA-66512",
+    "module": "EWM",
+    "classification": "HU"
+  }
+        {
+    "id": "10009",
+    "title": "VDA-55003",
+    "module": "EWM",
+    "classification": "HU"
+  }
+        {
+    "id": "10010",
+    "title": "VDA-55006",
+    "module": "EWM",
+    "classification": "HU"
+  }
 ]
 
 
