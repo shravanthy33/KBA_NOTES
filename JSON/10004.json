@@ -1,0 +1,20 @@
+{
+  "Title": "Half Odette Label",
+  "KBA": "10004",
+  "Date": "2026-03-17 08:06:45",
+  "Description": "Label for Half Odette Label with size A5(210*148mm) using action ZHU_HLFODETTELBL",
+  "Condition To Print": "Only condition record maintenance. No weigh update is needed.",
+  "Environment": "EWM 2020; Embedded EWM",
+  "Size": "A5(210*148mm)",
+  "Action Definition": "ZHU_HLFODETTELBL",
+  "Additional Info": {
+    "DO": 9873,
+    "WRICEF": "WH-1716",
+    "Printer": "Printer name determined from condition record",
+    "Type of Form": "Bartender"
+  }
+"Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10004.jpg"
+  ]
+
+}

@@ -1,0 +1,26 @@
+{
+  "Title": "VDA 55005",
+  "KBA": "10007",
+  "Date": "2026-03-17 08:06:46.06",
+  "Description": "Label for VDA 55005 with size A5(210*148mm) using action ZHU_VDA_FORMS",
+  "Condition To Print": "Label is printed upon HU weigh update",
+  "Environment": "EWM 2020; Embedded EWM",
+  "Size": "A5(210*148mm)",
+  "Action Definition": "ZHU_VDA_FORMS",
+  "Additional Info": {
+    "DO": 4080,
+    "WRICEF": "WH-1818",
+    "Printer": "Printer to be obtained from condition recor
+    "Details" : Table ZT0430 is to be maintianed with Ship to party based on which following fields are customised.
+                Truncate HU to 9 character.
+                Date format with D suffix with DDMMYY format.
+                Unloading pt after colon(:) is printed.
+                Supplier code from ZED1 text is printed.
+                Delivery number is truncated to 8 characters (last 8)",
+    "Type of Form": "Adobe"
+  }
+"Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10007.jpg"
+  ]
+
+}

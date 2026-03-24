@@ -1,0 +1,20 @@
+{
+  "Title": "VDA 55003",
+  "KBA": "10009",
+  "Date": "2026-03-17 08:06:46",
+  "Description": "Label for VDA 55003 with size A5(210*148mm) using action ZHU_VDA_FORMS",
+  "Condition To Print": "Label triggered upon HU weigh update",
+  "Environment": "EWM 2020; Embedded EWM",
+  "Size": "A5(210*148mm)",
+  "Action Definition": "ZHU_VDA_FORMS",
+  "Additional Info": {
+    "DO": 3438,
+    "WRICEF": "WH-1818",
+    "Printer": "Determined from condition record",
+    "Type of Form": "Adobe"
+    "Details": "This form is not used by any sites"
+  }
+"Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10009.jpg"
+  ]
+}

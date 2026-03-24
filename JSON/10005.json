@@ -1,0 +1,20 @@
+{
+  "Title": "Small Odette Label 4X6",
+  "KBA": "10005",
+  "Date": "2026-03-17 08:06:46.02",
+  "Description": "Label for Small Odette Label 4X6 with size 4X6 using action ZHU_SMLODETTELBL_4X6",
+  "Condition To Print": "Only based on condition record maintenance the form is triggered.",
+  "Environment": "EWM 2020; Embedded EWM",
+  "Size": "4X6",
+  "Action Definition": "ZHU_SMLODETTELBL_4X6",
+  "Additional Info": {
+    "DO": 9873,
+    "WRICEF": "WH-1716",
+    "Printer": "Printer name determined from condition record",
+    "Type of Form": "Bartender"
+  }
+"Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10005.jpg"
+  ]
+
+}
