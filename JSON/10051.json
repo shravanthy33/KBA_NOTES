@@ -5,7 +5,7 @@
   "Description": "Label for Kanban Label",
   "Condition To Print": "Triggered when WO status = 'C' or WT status = 'C'",
   "Environment": "EWM 2020; Embedded EWM",
-  "Size":  "To be confirmed"
+  "Size":  "To be confirmed",
   "Action Definition": "/SCWM/PRWO6",
   "Additional Info": {
     "DO": "8962",
