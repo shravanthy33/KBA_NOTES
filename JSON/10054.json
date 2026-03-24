@@ -12,5 +12,8 @@
     "WRICEF": "Printed as\r\n2010 -Picking Label, \r\n2100 - Production Label, \r\n1010 - Putaway Label, \r\nothers - WT Label\r\n\r\nDocument refenence, Text Z146 is printed\r\n\r\nFor barcode exclusion maintain the fields in DDC 5 -> 5.2 -> 5.2.100\r\n\r\nPrinter determined from condition records",
     "Printer": "Triggered based on condition record only for open WO",
     "Type of Form": "Bartender"
-  }
+    },
+  "Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10054.jpg"
+  ]
 }
