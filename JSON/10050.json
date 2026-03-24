@@ -12,5 +12,8 @@
     "WRICEF": "Printer determination from condition record",
     "Printer": "Triggers when condition record is met and WT status = 1 or 3\r\n1 - Create\r\n3 - Create and confirm immediately",
     "Type of Form": "Bartender"
-  }
+  },
+  "Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10010.jpg"
+  ]
 }
