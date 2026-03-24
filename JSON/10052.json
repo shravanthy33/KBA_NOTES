@@ -12,5 +12,8 @@
     "WRICEF": "1. Get from condition record \r\n2. User param with id as ZRF_PRINTER\r\n\r\nPrints the WO number only",
     "Printer": "Triggers when condition record matches\r\n\r\nCondition record is maintained for a specific logical transaction where WO label is needed",
     "Type of Form": "Bartender"
-  }
+    },
+  "Images": [
+    "https://shravanthy33.github.io/KBA_NOTES/Images/10052.jpg"
+  ]
 }
